@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom brand colors
+				brand: {
+					red: "#e53e3e",
+					gray: "#2d3748",
+					light: "#f7fafc",
+					dark: "#1a202c"
 				}
 			},
 			borderRadius: {
@@ -84,11 +92,28 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'count-up': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'count-up': 'count-up 2s ease-out'
+			},
+			fontFamily: {
+				sans: [
+					'Inter',
+					'-apple-system',
+					'BlinkMacSystemFont',
+					'Segoe UI',
+					'Roboto',
+					'Helvetica Neue',
+					'Arial',
+					'sans-serif'
+				]
 			}
 		}
 	},
