@@ -70,7 +70,8 @@ const MockTestDetail = () => {
   const { testId } = useParams();
   const navigate = useNavigate();
   
-  const test = mockTestData[testId as keyof typeof mockTestData];
+  const testIdNumber = parseInt(testId || '0', 10);
+  const test = mockTestData[testIdNumber as keyof typeof mockTestData];
   
   if (!test) {
     return (
