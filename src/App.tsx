@@ -25,6 +25,9 @@ import MockTestInstructions from "./pages/MockTestInstructions";
 import MockTestInterface from "./pages/MockTestInterface";
 import MockTestResults from "./pages/MockTestResults";
 import MockAssessment from "./pages/MockAssessment";
+import MockAssessmentDetail from "./pages/MockAssessmentDetail";
+import MockAssessmentInterface from "./pages/MockAssessmentInterface";
+import MockAssessmentResults from "./pages/MockAssessmentResults";
 import PracticeProblems from "./pages/PracticeProblems";
 import InterviewPreparation from "./pages/InterviewPreparation";
 
@@ -60,8 +63,13 @@ const App = () => {
               <Route path="/mock-test/:testId/test" element={<MockTestInterface />} />
               <Route path="/mock-test/:testId/results" element={<MockTestResults />} />
               
-              {/* Other Explore Routes */}
+              {/* Mock Assessment Routes */}
               <Route path="/mock-assessment" element={<MockAssessment />} />
+              <Route path="/mock-assessment/:assessmentId" element={<MockAssessmentDetail />} />
+              <Route path="/mock-assessment/:assessmentId/interface" element={<MockAssessmentInterface />} />
+              <Route path="/mock-assessment/:assessmentId/results" element={<MockAssessmentResults />} />
+              
+              {/* Other Explore Routes */}
               <Route path="/practice-problems" element={<PracticeProblems />} />
               <Route path="/interview-preparation" element={<InterviewPreparation />} />
               

@@ -92,6 +92,10 @@ const MockAssessment = () => {
   };
 
   const handleStartAssessment = (assessmentId: number) => {
+    navigate(`/mock-assessment/${assessmentId}/interface`);
+  };
+
+  const handleViewDetails = (assessmentId: number) => {
     navigate(`/mock-assessment/${assessmentId}`);
   };
 
@@ -132,7 +136,11 @@ const MockAssessment = () => {
           >
             Start Test
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            onClick={() => handleViewDetails(assessment.id)}
+          >
             View Details
           </Button>
         </div>
