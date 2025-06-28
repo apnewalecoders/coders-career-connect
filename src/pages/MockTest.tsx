@@ -12,7 +12,7 @@ const mockTests = [
     title: "Object-Oriented Programming",
     description: "Test your knowledge of OOP concepts, inheritance, polymorphism, and design patterns.",
     questions: 20,
-    duration: "30 mins",
+    duration: "20 mins",
     difficulty: "Medium",
     icon: <FileText className="h-8 w-8 text-blue-500" />
   },
@@ -21,7 +21,7 @@ const mockTests = [
     title: "Data Structures & Algorithms",
     description: "Comprehensive test covering arrays, linked lists, trees, graphs, and sorting algorithms.",
     questions: 20,
-    duration: "45 mins",
+    duration: "20 mins",
     difficulty: "Hard",
     icon: <Award className="h-8 w-8 text-green-500" />
   },
@@ -30,7 +30,7 @@ const mockTests = [
     title: "Computer Networks",
     description: "Test your understanding of networking protocols, OSI model, and network security.",
     questions: 20,
-    duration: "35 mins",
+    duration: "20 mins",
     difficulty: "Medium",
     icon: <Users className="h-8 w-8 text-purple-500" />
   },
@@ -39,7 +39,7 @@ const mockTests = [
     title: "Operating Systems",
     description: "Cover process management, memory management, file systems, and synchronization.",
     questions: 20,
-    duration: "40 mins",
+    duration: "20 mins",
     difficulty: "Medium",
     icon: <Clock className="h-8 w-8 text-orange-500" />
   },
@@ -48,7 +48,7 @@ const mockTests = [
     title: "Database Management",
     description: "Test your knowledge of SQL, database design, normalization, and transactions.",
     questions: 20,
-    duration: "30 mins",
+    duration: "20 mins",
     difficulty: "Easy",
     icon: <FileText className="h-8 w-8 text-red-500" />
   },
@@ -57,7 +57,7 @@ const mockTests = [
     title: "Software Engineering",
     description: "Comprehensive test on SDLC, testing methodologies, and project management.",
     questions: 20,
-    duration: "35 mins",
+    duration: "20 mins",
     difficulty: "Easy",
     icon: <Award className="h-8 w-8 text-indigo-500" />
   }
@@ -76,6 +76,10 @@ const MockTest = () => {
   };
 
   const handleStartTest = (testId: number) => {
+    navigate(`/mock-test/${testId}/instructions`);
+  };
+
+  const handleViewDetails = (testId: number) => {
     navigate(`/mock-test/${testId}`);
   };
 
@@ -124,7 +128,11 @@ const MockTest = () => {
                   >
                     Start Test
                   </Button>
-                  <Button variant="outline" className="flex-1">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => handleViewDetails(test.id)}
+                  >
                     View Details
                   </Button>
                 </div>

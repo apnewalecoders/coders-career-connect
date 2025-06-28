@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,10 @@ import NotFound from "./pages/NotFound";
 
 // New Explore Pages
 import MockTest from "./pages/MockTest";
+import MockTestDetail from "./pages/MockTestDetail";
+import MockTestInstructions from "./pages/MockTestInstructions";
+import MockTestInterface from "./pages/MockTestInterface";
+import MockTestResults from "./pages/MockTestResults";
 import MockAssessment from "./pages/MockAssessment";
 import PracticeProblems from "./pages/PracticeProblems";
 import InterviewPreparation from "./pages/InterviewPreparation";
@@ -50,8 +53,14 @@ const App = () => {
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/post-job" element={<PostJob />} />
               
-              {/* New Explore Routes */}
+              {/* Mock Test Routes */}
               <Route path="/mock-test" element={<MockTest />} />
+              <Route path="/mock-test/:testId" element={<MockTestDetail />} />
+              <Route path="/mock-test/:testId/instructions" element={<MockTestInstructions />} />
+              <Route path="/mock-test/:testId/test" element={<MockTestInterface />} />
+              <Route path="/mock-test/:testId/results" element={<MockTestResults />} />
+              
+              {/* Other Explore Routes */}
               <Route path="/mock-assessment" element={<MockAssessment />} />
               <Route path="/practice-problems" element={<PracticeProblems />} />
               <Route path="/interview-preparation" element={<InterviewPreparation />} />
