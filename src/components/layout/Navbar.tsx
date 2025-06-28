@@ -3,7 +3,13 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const { isLoggedIn, logout } = useAuth();
@@ -39,6 +45,13 @@ const Navbar = () => {
     { name: "Study Material", path: "/study-material" },
   ];
 
+  const exploreItems = [
+    { name: "Mock Test", path: "/mock-test" },
+    { name: "Mock Assessment", path: "/mock-assessment" },
+    { name: "Practice Problems", path: "/practice-problems" },
+    { name: "Interview Preparation", path: "/interview-preparation" },
+  ];
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -67,6 +80,31 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Explore Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-red flex items-center gap-1"
+                >
+                  Explore
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 bg-white shadow-lg border">
+                {exploreItems.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild>
+                    <Link
+                      to={item.path}
+                      className="w-full px-3 py-2 text-sm hover:bg-gray-50 hover:text-brand-red transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Right Side Navigation - Auth Buttons */}
@@ -128,6 +166,21 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Mobile Explore Items */}
+            <div className="border-t border-gray-200 pt-2">
+              <div className="text-sm font-medium text-gray-500 px-3 py-1">Explore</div>
+              {exploreItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="block px-6 py-2 text-base font-medium text-gray-700 hover:text-brand-red"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+            
             <div className="border-t border-gray-200 my-2 pt-2 space-y-2">
               {isLoggedIn ? (
                 <>

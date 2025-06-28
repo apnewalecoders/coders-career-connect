@@ -19,6 +19,12 @@ import SignUp from "./pages/SignUp";
 import PostJob from "./pages/PostJob";
 import NotFound from "./pages/NotFound";
 
+// New Explore Pages
+import MockTest from "./pages/MockTest";
+import MockAssessment from "./pages/MockAssessment";
+import PracticeProblems from "./pages/PracticeProblems";
+import InterviewPreparation from "./pages/InterviewPreparation";
+
 // Context
 import { AuthProvider } from "./context/AuthContext";
 
@@ -43,6 +49,13 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/post-job" element={<PostJob />} />
+              
+              {/* New Explore Routes */}
+              <Route path="/mock-test" element={<MockTest />} />
+              <Route path="/mock-assessment" element={<MockAssessment />} />
+              <Route path="/practice-problems" element={<PracticeProblems />} />
+              <Route path="/interview-preparation" element={<InterviewPreparation />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
