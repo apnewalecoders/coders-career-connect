@@ -135,7 +135,7 @@ const MockAssessmentDetail = () => {
                 <Card key={relatedAssessment.id} className="cursor-pointer hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <h4 className="font-medium text-sm text-gray-900 mb-2">{relatedAssessment.title}</h4>
-                    {relatedAssessment.company && (
+                    {'company' in relatedAssessment && (
                       <div className="text-xs text-brand-red font-medium mb-1">{relatedAssessment.company}</div>
                     )}
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(relatedAssessment.difficulty)}`}>
@@ -156,7 +156,7 @@ const MockAssessmentDetail = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">{assessment.title}</h1>
                   <p className="text-gray-600">{assessment.category}</p>
-                  {assessment.company && (
+                  {'company' in assessment && (
                     <p className="text-brand-red font-medium">{assessment.company}</p>
                   )}
                 </div>
