@@ -1,10 +1,12 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Code, Building, Users } from "lucide-react";
+import AssessmentInstructions from "@/components/assessment/AssessmentInstructions";
+import FullScreenAssessment from "@/components/assessment/FullScreenAssessment";
+import AssessmentFilters from "@/components/assessment/AssessmentFilters";
 
 const randomAssessments = [
   {
@@ -81,6 +83,8 @@ const companyAssessments = [
 
 const MockAssessment = () => {
   const navigate = useNavigate();
+  const [activeAssessment, setActiveAssessment] = useState<number | null>(null);
+  const [filteredAssessments, setFilteredAssessments] = useState([...randomAssessments, ...companyAssessments]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -92,11 +96,28 @@ const MockAssessment = () => {
   };
 
   const handleStartAssessment = (assessmentId: number) => {
-    navigate(`/mock-assessment/${assessmentId}/interface`);
+    setActiveAssessment(assessmentId);
+  };
+
+  const handleExitAssessment = () => {
+    setActiveAssessment(null);
   };
 
   const handleViewDetails = (assessmentId: number) => {
     navigate(`/mock-assessment/${assessmentId}`);
+  };
+
+  const handleFilterChange = (filters: { company: string; role: string; topic: string }) => {
+    let filtered = [...randomAssessments, ...companyAssessments];
+    
+    if (filters.company !== "All Companies") {
+      filtered = filtered.filter(assessment => 
+        'company' in assessment && assessment.company === filters.company
+      );
+    }
+    
+    // Add more filter logic here as needed
+    setFilteredAssessments(filtered);
   };
 
   const AssessmentCard = ({ assessment, showCompany = false }: { assessment: any, showCompany?: boolean }) => (
@@ -109,7 +130,7 @@ const MockAssessment = () => {
           </span>
         </div>
         <CardTitle className="text-xl font-semibold text-gray-900">{assessment.title}</CardTitle>
-        {showCompany && (
+        {showCompany && 'company' in assessment && (
           <div className="text-sm text-brand-red font-medium">{assessment.company}</div>
         )}
         <CardDescription className="text-gray-600 leading-relaxed">
@@ -130,12 +151,10 @@ const MockAssessment = () => {
         </div>
         
         <div className="flex gap-2 pt-2">
-          <Button 
-            onClick={() => handleStartAssessment(assessment.id)}
-            className="flex-1 bg-brand-red hover:bg-red-500 text-white"
-          >
-            Start Test
-          </Button>
+          <AssessmentInstructions 
+            assessment={assessment}
+            onStartAssessment={() => handleStartAssessment(assessment.id)}
+          />
           <Button 
             variant="outline" 
             className="flex-1"
@@ -148,6 +167,15 @@ const MockAssessment = () => {
     </Card>
   );
 
+  if (activeAssessment) {
+    return (
+      <FullScreenAssessment 
+        assessmentId={activeAssessment}
+        onExit={handleExitAssessment}
+      />
+    );
+  }
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-16">
@@ -158,6 +186,9 @@ const MockAssessment = () => {
           </p>
         </div>
 
+        {/* Filters */}
+        <AssessmentFilters onFilterChange={handleFilterChange} />
+
         {/* Random Assessments Section */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -165,7 +196,7 @@ const MockAssessment = () => {
             Random Assessments
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {randomAssessments.map((assessment) => (
+            {filteredAssessments.filter(a => a.id <= 3).map((assessment) => (
               <AssessmentCard key={assessment.id} assessment={assessment} />
             ))}
           </div>
@@ -178,7 +209,7 @@ const MockAssessment = () => {
             Company-wise Assessments
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {companyAssessments.map((assessment) => (
+            {filteredAssessments.filter(a => a.id > 3).map((assessment) => (
               <AssessmentCard key={assessment.id} assessment={assessment} showCompany={true} />
             ))}
           </div>
