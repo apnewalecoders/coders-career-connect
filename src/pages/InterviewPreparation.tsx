@@ -2,17 +2,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Search, Building, User, Briefcase, Filter, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
+import FilterSidebar from "@/components/interview/FilterSidebar";
+import MobileFilters from "@/components/interview/MobileFilters";
+import InterviewList from "@/components/interview/InterviewList";
 
 const companies = ["All Companies", "TCS", "Amazon", "Google", "Microsoft", "Wipro", "Infosys", "Accenture", "IBM"];
 const roles = ["All Roles", "SDE", "Analyst", "Consultant", "Developer", "QA Engineer", "Data Scientist"];
@@ -111,25 +105,6 @@ const InterviewPreparation = () => {
     return matchesCompany && matchesRole && matchesExperience && matchesSearch;
   });
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Easy": return "bg-green-100 text-green-800 border-green-200";
-      case "Medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "Hard": return "bg-red-100 text-red-800 border-red-200";
-      default: return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getExperienceColor = (experience: string) => {
-    switch (experience) {
-      case "Fresher": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "1-2 Years": return "bg-purple-100 text-purple-800 border-purple-200";
-      case "3-5 Years": return "bg-orange-100 text-orange-800 border-orange-200";
-      case "5+ Years": return "bg-gray-100 text-gray-800 border-gray-200";
-      default: return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   const handleReadExperience = (experienceId: number) => {
     navigate(`/interview-preparation/${experienceId}`);
   };
@@ -154,93 +129,18 @@ const InterviewPreparation = () => {
 
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Desktop Filters - Left Sidebar */}
-          <div className="hidden lg:block lg:w-1/4">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-4">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Filter className="h-5 w-5 text-brand-red" />
-                  Filters
-                </h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={resetFilters}
-                  className="text-brand-red hover:bg-red-50"
-                >
-                  Clear
-                </Button>
-              </div>
-              
-              {/* Companies */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <Building className="h-4 w-4 text-gray-600" />
-                  Company
-                </h4>
-                <div className="space-y-2">
-                  {companies.map((company) => (
-                    <button
-                      key={company}
-                      onClick={() => setSelectedCompany(company)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                        selectedCompany === company
-                          ? "bg-brand-red text-white shadow-md"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      }`}
-                    >
-                      {company}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Roles */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <Briefcase className="h-4 w-4 text-gray-600" />
-                  Role
-                </h4>
-                <div className="space-y-2">
-                  {roles.map((role) => (
-                    <button
-                      key={role}
-                      onClick={() => setSelectedRole(role)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                        selectedRole === role
-                          ? "bg-brand-red text-white shadow-md"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      }`}
-                    >
-                      {role}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Experience Level */}
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-600" />
-                  Experience
-                </h4>
-                <div className="space-y-2">
-                  {experienceLevels.map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setSelectedExperience(level)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                        selectedExperience === level
-                          ? "bg-brand-red text-white shadow-md"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <FilterSidebar
+            companies={companies}
+            roles={roles}
+            experienceLevels={experienceLevels}
+            selectedCompany={selectedCompany}
+            selectedRole={selectedRole}
+            selectedExperience={selectedExperience}
+            onCompanyChange={setSelectedCompany}
+            onRoleChange={setSelectedRole}
+            onExperienceChange={setSelectedExperience}
+            onResetFilters={resetFilters}
+          />
 
           {/* Main Content */}
           <div className="flex-1 lg:w-3/4">
@@ -259,156 +159,25 @@ const InterviewPreparation = () => {
               </div>
 
               {/* Mobile Filter Dropdowns */}
-              <div className="flex lg:hidden gap-3 overflow-x-auto pb-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="whitespace-nowrap flex items-center gap-2 min-w-fit">
-                      <Building className="h-4 w-4" />
-                      {selectedCompany === "All Companies" ? "Company" : selectedCompany}
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48">
-                    {companies.map((company) => (
-                      <DropdownMenuItem
-                        key={company}
-                        onClick={() => setSelectedCompany(company)}
-                        className={selectedCompany === company ? "bg-brand-red text-white" : ""}
-                      >
-                        {company}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="whitespace-nowrap flex items-center gap-2 min-w-fit">
-                      <Briefcase className="h-4 w-4" />
-                      {selectedRole === "All Roles" ? "Role" : selectedRole}
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48">
-                    {roles.map((role) => (
-                      <DropdownMenuItem
-                        key={role}
-                        onClick={() => setSelectedRole(role)}
-                        className={selectedRole === role ? "bg-brand-red text-white" : ""}
-                      >
-                        {role}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="whitespace-nowrap flex items-center gap-2 min-w-fit">
-                      <User className="h-4 w-4" />
-                      {selectedExperience === "All Levels" ? "Experience" : selectedExperience}
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48">
-                    {experienceLevels.map((level) => (
-                      <DropdownMenuItem
-                        key={level}
-                        onClick={() => setSelectedExperience(level)}
-                        className={selectedExperience === level ? "bg-brand-red text-white" : ""}
-                      >
-                        {level}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={resetFilters}
-                  className="text-brand-red hover:bg-red-50 whitespace-nowrap"
-                >
-                  Clear All
-                </Button>
-              </div>
+              <MobileFilters
+                companies={companies}
+                roles={roles}
+                experienceLevels={experienceLevels}
+                selectedCompany={selectedCompany}
+                selectedRole={selectedRole}
+                selectedExperience={selectedExperience}
+                onCompanyChange={setSelectedCompany}
+                onRoleChange={setSelectedRole}
+                onExperienceChange={setSelectedExperience}
+                onResetFilters={resetFilters}
+              />
             </div>
 
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="text-sm text-gray-500">
-                {filteredExperiences.length} interview experience{filteredExperiences.length !== 1 ? 's' : ''} found
-              </div>
-            </div>
-
-            {/* Interview Experiences Grid */}
-            <div className="grid gap-6">
-              {filteredExperiences.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="max-w-md mx-auto">
-                    <User className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-gray-900 mb-2">No experiences found</h3>
-                    <p className="text-gray-500 mb-6">
-                      Try adjusting your filters or search terms to find relevant interview experiences.
-                    </p>
-                    <Button onClick={resetFilters} variant="outline">
-                      Clear Filters
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                filteredExperiences.map((experience) => (
-                  <Card key={experience.id} className="hover:shadow-lg transition-all duration-300 border-gray-100 hover:border-gray-200">
-                    <CardHeader className="pb-4">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                        <div className="flex-1">
-                          <CardTitle className="text-xl font-semibold text-gray-900 mb-3 leading-tight">
-                            {experience.title}
-                          </CardTitle>
-                          
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            <Badge className="bg-brand-red hover:bg-red-600 text-white text-xs font-medium px-3 py-1">
-                              {experience.company}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs font-medium px-3 py-1 border-gray-300">
-                              {experience.role}
-                            </Badge>
-                            <Badge className={`text-xs font-medium px-3 py-1 border ${getExperienceColor(experience.experience)}`}>
-                              {experience.experience}
-                            </Badge>
-                            <Badge className={`text-xs font-medium px-3 py-1 border ${getDifficultyColor(experience.difficulty)}`}>
-                              {experience.difficulty}
-                            </Badge>
-                          </div>
-                          
-                          <CardDescription className="text-gray-600 leading-relaxed mb-4">
-                            {experience.summary}
-                          </CardDescription>
-
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <div className="w-2 h-2 bg-brand-red rounded-full"></div>
-                              {experience.rounds} Rounds
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                              {experience.date}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <Button
-                          onClick={() => handleReadExperience(experience.id)}
-                          className="bg-brand-red hover:bg-red-600 text-white shadow-md hover:shadow-lg transition-all duration-200 min-w-fit"
-                        >
-                          Read Experience
-                        </Button>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))
-              )}
-            </div>
+            <InterviewList
+              experiences={filteredExperiences}
+              onReadExperience={handleReadExperience}
+              onResetFilters={resetFilters}
+            />
           </div>
         </div>
       </div>
