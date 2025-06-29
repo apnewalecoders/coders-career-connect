@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,6 +30,7 @@ import MockAssessmentDetail from "./pages/MockAssessmentDetail";
 import MockAssessmentInterface from "./pages/MockAssessmentInterface";
 import MockAssessmentResults from "./pages/MockAssessmentResults";
 import PracticeProblems from "./pages/PracticeProblems";
+import PracticeProblemSolving from "./pages/PracticeProblemSolving";
 import InterviewPreparation from "./pages/InterviewPreparation";
 
 // Context
@@ -71,6 +73,7 @@ const App = () => {
               
               {/* Other Explore Routes */}
               <Route path="/practice-problems" element={<PracticeProblems />} />
+              <Route path="/practice-problems/:problemId" element={<PracticeProblemSolving />} />
               <Route path="/interview-preparation" element={<InterviewPreparation />} />
               
               <Route path="*" element={<NotFound />} />
