@@ -32,6 +32,7 @@ import MockAssessmentResults from "./pages/MockAssessmentResults";
 import PracticeProblems from "./pages/PracticeProblems";
 import PracticeProblemSolving from "./pages/PracticeProblemSolving";
 import InterviewPreparation from "./pages/InterviewPreparation";
+import InterviewExperienceDetail from "./pages/InterviewExperienceDetail";
 
 // Context
 import { AuthProvider } from "./context/AuthContext";
@@ -75,6 +76,7 @@ const App = () => {
               <Route path="/practice-problems" element={<PracticeProblems />} />
               <Route path="/practice-problems/:problemId" element={<PracticeProblemSolving />} />
               <Route path="/interview-preparation" element={<InterviewPreparation />} />
+              <Route path="/interview-preparation/:experienceId" element={<InterviewExperienceDetail />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
