@@ -37,19 +37,19 @@ const FilterDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="whitespace-nowrap flex items-center gap-2 min-w-fit bg-white">
+        <Button variant="outline" className="whitespace-nowrap flex items-center gap-2 min-w-fit bg-white border-gray-200">
           {icon}
           <span className="hidden sm:inline">{title}:</span>
-          <span className="font-normal">{displayValue}</span>
+          <span className="font-normal text-sm">{displayValue}</span>
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48 bg-white">
+      <DropdownMenuContent className="w-48 bg-white z-50 border shadow-lg">
         {options.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => onSelect(option.value)}
-            className={selectedValue === option.value ? "bg-brand-red text-white" : ""}
+            className={selectedValue === option.value ? "bg-brand-red text-white" : "hover:bg-gray-50"}
           >
             {option.label}
           </DropdownMenuItem>

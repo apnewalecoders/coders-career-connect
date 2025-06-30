@@ -144,7 +144,7 @@ const InterviewPreparation = () => {
 
           {/* Main Content */}
           <div className="flex-1 lg:w-3/4">
-            {/* Mobile Filters & Search */}
+            {/* Search Bar & Mobile Filters */}
             <div className="mb-6 space-y-4">
               {/* Search Bar */}
               <div className="relative">
@@ -158,7 +158,7 @@ const InterviewPreparation = () => {
                 />
               </div>
 
-              {/* Mobile Filter Dropdowns */}
+              {/* Mobile Filter Sheet */}
               <MobileFilters
                 companies={companies}
                 roles={roles}
