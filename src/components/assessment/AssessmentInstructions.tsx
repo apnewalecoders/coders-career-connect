@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Clock, FileText, AlertCircle, CheckCircle } from "lucide-react";
+import { Clock, FileText, AlertCircle, CheckCircle, Target } from "lucide-react";
 
 interface AssessmentInstructionsProps {
   assessment: {
@@ -19,7 +19,7 @@ const AssessmentInstructions = ({ assessment, onStartAssessment }: AssessmentIns
   const [showInstructions, setShowInstructions] = useState(false);
 
   const instructions = [
-    "You will have 60 minutes to complete 2 coding problems",
+    `You will have ${assessment.duration} to complete ${assessment.problems} coding problems`,
     "Each problem has multiple test cases that must pass",
     "You can switch between problems at any time",
     "Your code is auto-saved every 30 seconds",
@@ -36,7 +36,8 @@ const AssessmentInstructions = ({ assessment, onStartAssessment }: AssessmentIns
   return (
     <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
       <DialogTrigger asChild>
-        <Button className="bg-brand-red hover:bg-red-500 text-white">
+        <Button className="w-full bg-brand-red hover:bg-red-600 text-white font-medium">
+          <Target className="h-4 w-4 mr-2" />
           Start Assessment
         </Button>
       </DialogTrigger>
