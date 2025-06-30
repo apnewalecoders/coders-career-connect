@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -16,6 +17,7 @@ interface AssessmentInstructionsProps {
 }
 
 const AssessmentInstructions = ({ assessment, onStartAssessment }: AssessmentInstructionsProps) => {
+  const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
 
   const instructions = [
@@ -30,7 +32,8 @@ const AssessmentInstructions = ({ assessment, onStartAssessment }: AssessmentIns
 
   const handleStartAssessment = () => {
     setShowInstructions(false);
-    onStartAssessment();
+    // Navigate to the new test interface route
+    navigate(`/mock-assessment/${assessment.id}/interface`);
   };
 
   return (

@@ -29,6 +29,7 @@ import MockAssessment from "./pages/MockAssessment";
 import MockAssessmentDetail from "./pages/MockAssessmentDetail";
 import MockAssessmentInterface from "./pages/MockAssessmentInterface";
 import MockAssessmentResults from "./pages/MockAssessmentResults";
+import MockAssessmentTestInterface from "./pages/MockAssessmentTestInterface";
 import PracticeProblems from "./pages/PracticeProblems";
 import PracticeProblemSolving from "./pages/PracticeProblemSolving";
 import InterviewPreparation from "./pages/InterviewPreparation";
@@ -69,7 +70,7 @@ const App = () => {
               {/* Mock Assessment Routes */}
               <Route path="/mock-assessment" element={<MockAssessment />} />
               <Route path="/mock-assessment/:assessmentId" element={<MockAssessmentDetail />} />
-              <Route path="/mock-assessment/:assessmentId/interface" element={<MockAssessmentInterface />} />
+              <Route path="/mock-assessment/:assessmentId/interface" element={<MockAssessmentTestInterface />} />
               <Route path="/mock-assessment/:assessmentId/results" element={<MockAssessmentResults />} />
               
               {/* Other Explore Routes */}
