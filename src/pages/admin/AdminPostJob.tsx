@@ -11,12 +11,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Plus, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
+interface JobFormData {
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  experience: string;
+  salary: string;
+  description: string;
+  requirements: string[];
+  benefits: string[];
+  skills: string[];
+  applicationDeadline: string;
+  contactEmail: string;
+}
+
 const AdminPostJob = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<JobFormData>({
     title: "",
     company: "",
     location: "",
@@ -31,33 +46,33 @@ const AdminPostJob = () => {
     contactEmail: ""
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: keyof JobFormData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleArrayChange = (field: string, index: number, value: string) => {
+  const handleArrayChange = (field: keyof Pick<JobFormData, 'requirements' | 'benefits' | 'skills'>, index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: prev[field as keyof typeof prev].map((item: string, i: number) => 
+      [field]: prev[field].map((item, i) => 
         i === index ? value : item
       )
     }));
   };
 
-  const addArrayItem = (field: string) => {
+  const addArrayItem = (field: keyof Pick<JobFormData, 'requirements' | 'benefits' | 'skills'>) => {
     setFormData(prev => ({
       ...prev,
-      [field]: [...prev[field as keyof typeof prev], ""]
+      [field]: [...prev[field], ""]
     }));
   };
 
-  const removeArrayItem = (field: string, index: number) => {
+  const removeArrayItem = (field: keyof Pick<JobFormData, 'requirements' | 'benefits' | 'skills'>, index: number) => {
     setFormData(prev => ({
       ...prev,
-      [field]: prev[field as keyof typeof prev].filter((_: string, i: number) => i !== index)
+      [field]: prev[field].filter((_, i) => i !== index)
     }));
   };
 
@@ -86,10 +101,10 @@ const AdminPostJob = () => {
     }
   };
 
-  const renderArrayInput = (field: string, label: string, placeholder: string) => (
+  const renderArrayInput = (field: keyof Pick<JobFormData, 'requirements' | 'benefits' | 'skills'>, label: string, placeholder: string) => (
     <div className="space-y-2">
       <Label className="text-sm font-medium">{label}</Label>
-      {formData[field as keyof typeof formData].map((item: string, index: number) => (
+      {formData[field].map((item, index) => (
         <div key={index} className="flex gap-2">
           <Input
             value={item}
@@ -97,7 +112,7 @@ const AdminPostJob = () => {
             placeholder={placeholder}
             className="flex-1"
           />
-          {formData[field as keyof typeof formData].length > 1 && (
+          {formData[field].length > 1 && (
             <Button
               type="button"
               variant="outline"
