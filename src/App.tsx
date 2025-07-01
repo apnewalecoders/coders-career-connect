@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,6 +33,13 @@ import PracticeProblems from "./pages/PracticeProblems";
 import PracticeProblemSolving from "./pages/PracticeProblemSolving";
 import InterviewPreparation from "./pages/InterviewPreparation";
 import InterviewExperienceDetail from "./pages/InterviewExperienceDetail";
+
+// Admin Pages
+import AdminPanel from "./pages/AdminPanel";
+import CreateMockTest from "./pages/admin/CreateMockTest";
+import CreateMockAssessment from "./pages/admin/CreateMockAssessment";
+import CreateCodingProblem from "./pages/admin/CreateCodingProblem";
+import CreateInterviewExperience from "./pages/admin/CreateInterviewExperience";
 
 // Context
 import { AuthProvider } from "./context/AuthContext";
@@ -78,6 +84,13 @@ const App = () => {
               <Route path="/practice-problems/:problemId" element={<PracticeProblemSolving />} />
               <Route path="/interview-preparation" element={<InterviewPreparation />} />
               <Route path="/interview-preparation/:experienceId" element={<InterviewExperienceDetail />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/admin/create-mock-test" element={<CreateMockTest />} />
+              <Route path="/admin/create-mock-assessment" element={<CreateMockAssessment />} />
+              <Route path="/admin/create-coding-problem" element={<CreateCodingProblem />} />
+              <Route path="/admin/create-interview-experience" element={<CreateInterviewExperience />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
