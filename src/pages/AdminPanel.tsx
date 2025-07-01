@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Target, Code, MessageSquare } from "lucide-react";
+import { FileText, Target, Code, MessageSquare, Briefcase, BookOpen, GraduationCap, Settings } from "lucide-react";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -40,6 +40,38 @@ const AdminPanel = () => {
       buttonText: "Post Experience",
       route: "/admin/create-interview-experience",
       color: "bg-orange-50 border-orange-200"
+    },
+    {
+      title: "Post Job",
+      description: "Create and publish job opportunities for users",
+      icon: Briefcase,
+      buttonText: "Post Job",
+      route: "/admin/post-job",
+      color: "bg-teal-50 border-teal-200"
+    },
+    {
+      title: "Create Blog Post",
+      description: "Write and publish informative blog articles",
+      icon: BookOpen,
+      buttonText: "Create Blog",
+      route: "/admin/create-blog",
+      color: "bg-indigo-50 border-indigo-200"
+    },
+    {
+      title: "Add Study Material",
+      description: "Upload educational resources and study guides",
+      icon: GraduationCap,
+      buttonText: "Add Material",
+      route: "/admin/add-study-material",
+      color: "bg-pink-50 border-pink-200"
+    },
+    {
+      title: "Manage Content",
+      description: "View, edit, and manage all platform content",
+      icon: Settings,
+      buttonText: "Manage Content",
+      route: "/admin/manage-content",
+      color: "bg-gray-50 border-gray-200"
     }
   ];
 
@@ -57,7 +89,7 @@ const AdminPanel = () => {
         </div>
 
         {/* Admin Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {adminCards.map((card, index) => {
             const IconComponent = card.icon;
             return (

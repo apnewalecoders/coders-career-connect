@@ -40,6 +40,10 @@ import CreateMockTest from "./pages/admin/CreateMockTest";
 import CreateMockAssessment from "./pages/admin/CreateMockAssessment";
 import CreateCodingProblem from "./pages/admin/CreateCodingProblem";
 import CreateInterviewExperience from "./pages/admin/CreateInterviewExperience";
+import AdminPostJob from "./pages/admin/AdminPostJob";
+import CreateBlog from "./pages/admin/CreateBlog";
+import AddStudyMaterial from "./pages/admin/AddStudyMaterial";
+import ManageContent from "./pages/admin/ManageContent";
 
 // Context
 import { AuthProvider } from "./context/AuthContext";
@@ -91,6 +95,10 @@ const App = () => {
               <Route path="/admin/create-mock-assessment" element={<CreateMockAssessment />} />
               <Route path="/admin/create-coding-problem" element={<CreateCodingProblem />} />
               <Route path="/admin/create-interview-experience" element={<CreateInterviewExperience />} />
+              <Route path="/admin/post-job" element={<AdminPostJob />} />
+              <Route path="/admin/create-blog" element={<CreateBlog />} />
+              <Route path="/admin/add-study-material" element={<AddStudyMaterial />} />
+              <Route path="/admin/manage-content" element={<ManageContent />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
