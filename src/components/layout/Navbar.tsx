@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
@@ -114,6 +114,14 @@ const Navbar = () => {
                 <Link to="/dashboard">
                   <Button variant="outline">Dashboard</Button>
                 </Link>
+                {user?.isAdmin && (
+                  <Link to="/admin">
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Admin Panel
+                    </Button>
+                  </Link>
+                )}
                 <Button variant="ghost" onClick={logout}>
                   Logout
                 </Button>
@@ -190,6 +198,15 @@ const Navbar = () => {
                   >
                     Dashboard
                   </Link>
+                  {user?.isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-2 px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-red"
+                    >
+                      <Shield className="h-4 w-4" />
+                      Admin Panel
+                    </Link>
+                  )}
                   <button
                     onClick={logout}
                     className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-red"
