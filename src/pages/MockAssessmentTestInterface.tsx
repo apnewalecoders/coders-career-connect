@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { X, Clock, Play, Send, FileText, AlertCircle, CheckCircle } from "lucide-react";
+import { X, Clock, FileText, AlertCircle, CheckCircle } from "lucide-react";
+import CodeCompiler from "@/components/compiler/CodeCompiler";
 
 const mockProblems = [
   {
@@ -31,7 +31,12 @@ Constraints:
 • -10⁹ ≤ nums[i] ≤ 10⁹
 • -10⁹ ≤ target ≤ 10⁹
 • Only one valid answer exists.`,
-    difficulty: "Easy"
+    difficulty: "Easy",
+    testCases: [
+      { input: "4\n2 7 11 15\n9", expectedOutput: "[0, 1]" },
+      { input: "3\n3 2 4\n6", expectedOutput: "[1, 2]" },
+      { input: "2\n3 3\n6", expectedOutput: "[0, 1]" }
+    ]
   },
   {
     id: 2,
@@ -58,7 +63,13 @@ Output: false
 Constraints:
 • 1 ≤ s.length ≤ 10⁴
 • s consists of parentheses only '()[]{}'.`,
-    difficulty: "Easy"
+    difficulty: "Easy",
+    testCases: [
+      { input: "()", expectedOutput: "true" },
+      { input: "()[]{}", expectedOutput: "true" },
+      { input: "(]", expectedOutput: "false" },
+      { input: "([)]", expectedOutput: "false" }
+    ]
   }
 ];
 
@@ -69,14 +80,6 @@ const MockAssessmentTestInterface = () => {
   const [showInstructions, setShowInstructions] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes in seconds
-  const [codes, setCodes] = useState<{[key: number]: string}>({
-    0: "// Write your solution here\n",
-    1: "// Write your solution here\n"
-  });
-  const [customInput, setCustomInput] = useState("");
-  const [output, setOutput] = useState("");
-  const [language, setLanguage] = useState("python");
-  const [isRunning, setIsRunning] = useState(false);
   const [submissions, setSubmissions] = useState<{[key: number]: boolean}>({});
   const [testStarted, setTestStarted] = useState(false);
 
@@ -138,47 +141,20 @@ const MockAssessmentTestInterface = () => {
     });
   };
 
-  const handleRun = async () => {
-    setIsRunning(true);
-    
-    setTimeout(() => {
-      let resultOutput = "";
-      
-      if (customInput.trim()) {
-        resultOutput = `Custom Input: ${customInput}\nOutput: [0, 1]`;
-      } else {
-        if (currentQuestion === 0) {
-          resultOutput = "✅ Test Case 1: Passed\n✅ Test Case 2: Passed\n✅ Test Case 3: Passed\n\nAll test cases passed!";
-        } else {
-          resultOutput = "✅ Test Case 1: Passed\n✅ Test Case 2: Passed\n❌ Test Case 3: Failed\n\n2 out of 3 test cases passed.";
-        }
-      }
-      
-      setOutput(resultOutput);
-      setIsRunning(false);
-    }, 2000);
+  const handleQuestionTab = (index: number) => {
+    setCurrentQuestion(index);
   };
 
-  const handleSubmit = () => {
+  const handleSubmissionSuccess = () => {
     setSubmissions(prev => ({ ...prev, [currentQuestion]: true }));
     
     if (currentQuestion < mockProblems.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setCustomInput("");
-      setOutput("");
     } else {
       navigate(`/mock-assessment/${assessmentId}/results`, {
         state: { submissions: { ...submissions, [currentQuestion]: true }, timeExpired: false }
       });
     }
-  };
-
-  const handleQuestionTab = (index: number) => {
-    setCurrentQuestion(index);
-  };
-
-  const handleCodeChange = (value: string) => {
-    setCodes(prev => ({ ...prev, [currentQuestion]: value }));
   };
 
   if (showInstructions) {
@@ -215,11 +191,11 @@ const MockAssessmentTestInterface = () => {
               </h3>
               <div className="space-y-2">
                 {[
-                  "You will see one question at a time",
-                  "Your code is auto-saved every 30 seconds",
-                  "You can run your code to test with sample inputs",
-                  "Submit each question when you're confident",
+                  "You will see one question at a time with an integrated code editor",
+                  "Test your code using the 'Run' button with custom inputs",
+                  "Submit your solution when ready - it will be validated against test cases",
                   "Timer starts immediately after clicking 'Start Test'",
+                  "All test cases must pass to mark a problem as solved",
                   "Test will auto-submit when time expires"
                 ].map((guideline, index) => (
                   <div key={index} className="flex items-start gap-2">
@@ -253,7 +229,6 @@ const MockAssessmentTestInterface = () => {
   }
 
   const currentProblem = mockProblems[currentQuestion];
-  const isSubmitted = submissions[currentQuestion];
 
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col">
@@ -312,117 +287,18 @@ const MockAssessmentTestInterface = () => {
         </AlertDialog>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Left Section - Problem (70%) */}
-        <div className="w-[70%] border-r bg-white overflow-y-auto">
-          <div className="p-6">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {currentProblem.title}
-              </h2>
-              <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                currentProblem.difficulty === "Easy" ? "bg-green-100 text-green-800" : 
-                currentProblem.difficulty === "Medium" ? "bg-yellow-100 text-yellow-800" : 
-                "bg-red-100 text-red-800"
-              }`}>
-                {currentProblem.difficulty}
-              </span>
-              {isSubmitted && (
-                <span className="ml-2 inline-block px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  Submitted ✓
-                </span>
-              )}
-            </div>
-            
-            <div className="prose max-w-none">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <pre className="whitespace-pre-wrap text-gray-800 font-sans leading-relaxed">
-                  {currentProblem.statement}
-                </pre>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Section - Code Editor (30%) */}
-        <div className="w-[30%] flex flex-col">
-          {/* Editor Header */}
-          <div className="p-4 border-b bg-gray-50">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">Code Editor</h3>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm"
-                disabled={isSubmitted}
-              >
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-                <option value="cpp">C++</option>
-                <option value="javascript">JavaScript</option>
-              </select>
-            </div>
-            
-            {/* Custom Input */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Custom Input (Optional)
-              </label>
-              <textarea
-                value={customInput}
-                onChange={(e) => setCustomInput(e.target.value)}
-                className="w-full h-16 px-3 py-2 border border-gray-300 rounded-md text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-brand-red"
-                placeholder="Enter custom test input..."
-                disabled={isSubmitted}
-              />
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <Button
-                onClick={handleRun}
-                disabled={isRunning || isSubmitted}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                <Play className="h-4 w-4 mr-1" />
-                {isRunning ? "Running..." : "▶️ Run"}
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitted}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                size="sm"
-              >
-                <Send className="h-4 w-4 mr-1" />
-                ✅ Submit
-              </Button>
-            </div>
-          </div>
-
-          {/* Code Editor */}
-          <div className="flex-1 p-4">
-            <textarea
-              value={codes[currentQuestion]}
-              onChange={(e) => handleCodeChange(e.target.value)}
-              className="w-full h-full resize-none border border-gray-300 rounded-md p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-red"
-              placeholder="Write your solution here..."
-              disabled={isSubmitted}
-            />
-          </div>
-
-          {/* Output Section */}
-          {output && (
-            <div className="border-t bg-gray-50 p-4">
-              <h4 className="font-medium mb-2 text-gray-900">Output & Test Results</h4>
-              <div className="bg-gray-900 text-green-400 p-3 rounded-md text-sm font-mono whitespace-pre-line max-h-32 overflow-y-auto">
-                {output}
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Main Content - Code Compiler */}
+      <div className="flex-1">
+        <CodeCompiler
+          problemTitle={currentProblem.title}
+          problemStatement={currentProblem.statement}
+          difficulty={currentProblem.difficulty}
+          testCases={currentProblem.testCases}
+          onSubmissionSuccess={handleSubmissionSuccess}
+          isFullScreen={true}
+          showTimer={true}
+          timeLeft={timeLeft}
+        />
       </div>
     </div>
   );

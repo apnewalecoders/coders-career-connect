@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { X, Clock, Play, Code, ChevronRight } from "lucide-react";
+import { X, Clock } from "lucide-react";
+import CodeCompiler from "@/components/compiler/CodeCompiler";
 
 interface FullScreenAssessmentProps {
   assessmentId: number;
@@ -15,16 +15,63 @@ const mockProblems = [
   {
     id: 1,
     title: "Two Sum",
-    description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+Example 1:
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+
+Example 2:
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+
+Constraints:
+• 2 ≤ nums.length ≤ 10⁴
+• -10⁹ ≤ nums[i] ≤ 10⁹
+• -10⁹ ≤ target ≤ 10⁹
+• Only one valid answer exists.`,
     difficulty: "Easy",
-    testCases: ["Input: nums = [2,7,11,15], target = 9", "Output: [0,1]"]
+    testCases: [
+      { input: "4\n2 7 11 15\n9", expectedOutput: "[0, 1]" },
+      { input: "3\n3 2 4\n6", expectedOutput: "[1, 2]" },
+      { input: "2\n3 3\n6", expectedOutput: "[0, 1]" }
+    ]
   },
   {
     id: 2,
     title: "Longest Substring Without Repeating Characters",
-    description: "Given a string s, find the length of the longest substring without repeating characters.",
+    description: `Given a string s, find the length of the longest substring without repeating characters.
+
+Example 1:
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3.
+
+Example 2:
+Input: s = "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+
+Example 3:
+Input: s = "pwwkew"
+Output: 3
+Explanation: The answer is "wke", with the length of 3.
+
+Constraints:
+• 0 ≤ s.length ≤ 5 * 10⁴
+• s consists of English letters, digits, symbols and spaces.`,
     difficulty: "Medium",
-    testCases: ["Input: s = 'abcabcbb'", "Output: 3"]
+    testCases: [
+      { input: "abcabcbb", expectedOutput: "3" },
+      { input: "bbbbb", expectedOutput: "1" },
+      { input: "pwwkew", expectedOutput: "3" },
+      { input: "", expectedOutput: "0" }
+    ]
   }
 ];
 
@@ -32,9 +79,7 @@ const FullScreenAssessment = ({ assessmentId, onExit }: FullScreenAssessmentProp
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState(3600); // 60 minutes in seconds
   const [currentProblem, setCurrentProblem] = useState(0);
-  const [code, setCode] = useState("// Write your solution here\n");
-  const [output, setOutput] = useState("");
-  const [language, setLanguage] = useState("javascript");
+  const [submissions, setSubmissions] = useState<{[key: number]: boolean}>({});
 
   useEffect(() => {
     // Enter full screen mode
@@ -77,15 +122,11 @@ const FullScreenAssessment = ({ assessmentId, onExit }: FullScreenAssessmentProp
     onExit();
   };
 
-  const handleRunCode = () => {
-    setOutput("Running code...\n✅ Test case 1 passed\n✅ Test case 2 passed\n✅ All test cases passed!");
-  };
-
-  const handleSubmitProblem = () => {
+  const handleSubmissionSuccess = () => {
+    setSubmissions(prev => ({ ...prev, [currentProblem]: true }));
+    
     if (currentProblem < mockProblems.length - 1) {
       setCurrentProblem(currentProblem + 1);
-      setCode("// Write your solution here\n");
-      setOutput("");
     } else {
       navigate(`/mock-assessment/${assessmentId}/results`);
     }
@@ -139,92 +180,18 @@ const FullScreenAssessment = ({ assessmentId, onExit }: FullScreenAssessmentProp
         </AlertDialog>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Problem Section */}
-        <div className="w-1/2 border-r bg-white overflow-y-auto">
-          <div className="p-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Code className="h-5 w-5" />
-                  {problem.title}
-                  <span className={`text-xs px-2 py-1 rounded ${
-                    problem.difficulty === "Easy" ? "bg-green-100 text-green-800" : 
-                    problem.difficulty === "Medium" ? "bg-yellow-100 text-yellow-800" : 
-                    "bg-red-100 text-red-800"
-                  }`}>
-                    {problem.difficulty}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Problem Description:</h4>
-                  <p className="text-gray-700">{problem.description}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Example:</h4>
-                  <div className="bg-gray-50 p-3 rounded-md space-y-1">
-                    {problem.testCases.map((testCase, index) => (
-                      <div key={index} className="font-mono text-sm">{testCase}</div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Code Editor Section */}
-        <div className="w-1/2 flex flex-col">
-          <div className="p-4 border-b bg-gray-50">
-            <div className="flex items-center gap-4">
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm"
-              >
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-                <option value="cpp">C++</option>
-              </select>
-              
-              <div className="flex gap-2 ml-auto">
-                <Button onClick={handleRunCode} variant="outline" size="sm">
-                  <Play className="h-4 w-4 mr-1" />
-                  Run
-                </Button>
-                <Button onClick={handleSubmitProblem} className="bg-brand-red hover:bg-red-600 text-white" size="sm">
-                  {currentProblem < mockProblems.length - 1 ? "Next Problem" : "Submit Assessment"}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 flex flex-col">
-            <div className="flex-1 p-4">
-              <textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full h-full resize-none border border-gray-300 rounded-md p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-red"
-                placeholder="Write your solution here..."
-              />
-            </div>
-
-            {output && (
-              <div className="border-t bg-gray-50 p-4">
-                <h4 className="font-medium mb-2">Output:</h4>
-                <pre className="bg-black text-green-400 p-3 rounded-md text-sm font-mono whitespace-pre-wrap">
-                  {output}
-                </pre>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Main Content - Code Compiler */}
+      <div className="flex-1">
+        <CodeCompiler
+          problemTitle={problem.title}
+          problemStatement={problem.description}
+          difficulty={problem.difficulty}
+          testCases={problem.testCases}
+          onSubmissionSuccess={handleSubmissionSuccess}
+          isFullScreen={true}
+          showTimer={true}
+          timeLeft={timeLeft}
+        />
       </div>
     </div>
   );
