@@ -11,7 +11,7 @@ interface EditorControlsProps {
   isRunning: boolean;
   isSubmitting: boolean;
   isSolved: boolean;
-  layout?: "default" | "compact";
+  layout?: "default" | "compact" | "leetcode";
 }
 
 const EditorControls = ({
@@ -24,6 +24,49 @@ const EditorControls = ({
   isSolved,
   layout = "default"
 }: EditorControlsProps) => {
+  if (layout === "leetcode") {
+    return (
+      <div className="p-4 border-t border-gray-200 bg-white space-y-4">
+        {/* Custom Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Custom Input
+          </label>
+          <Textarea
+            value={customInput}
+            onChange={(e) => onCustomInputChange(e.target.value)}
+            placeholder="Enter your test input here..."
+            className="h-20 font-mono text-sm resize-none"
+            disabled={isSolved}
+          />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <Button
+            onClick={onRun}
+            disabled={isRunning || isSolved}
+            variant="outline"
+            size="sm"
+            className="flex-1"
+          >
+            <Play className="h-4 w-4 mr-2" />
+            {isRunning ? "Running..." : "Run"}
+          </Button>
+          <Button
+            onClick={onSubmit}
+            disabled={isSubmitting || isSolved}
+            size="sm"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Send className="h-4 w-4 mr-2" />
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (layout === "compact") {
     return (
       <>

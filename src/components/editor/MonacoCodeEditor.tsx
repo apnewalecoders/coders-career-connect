@@ -9,6 +9,7 @@ import EditorHeader from "./components/EditorHeader";
 import CompactEditorHeader from "./components/CompactEditorHeader";
 import EditorControls from "./components/EditorControls";
 import OutputSection from "./components/OutputSection";
+import LeetCodeEditorHeader from "./components/LeetCodeEditorHeader";
 
 interface EditorProps {
   problemTitle: string;
@@ -19,7 +20,7 @@ interface EditorProps {
   isFullScreen?: boolean;
   showTimer?: boolean;
   timeLeft?: number;
-  layout?: "default" | "compact" | "mobile";
+  layout?: "default" | "compact" | "mobile" | "leetcode";
 }
 
 const MonacoCodeEditor = ({ 
@@ -38,7 +39,7 @@ const MonacoCodeEditor = ({
   const [customInput, setCustomInput] = useState("");
   const [isSolved, setIsSolved] = useState(false);
   const [isEditorFullScreen, setIsEditorFullScreen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(layout === "leetcode" ? false : true);
   const editorRef = useRef(null);
 
   const {
@@ -97,6 +98,65 @@ const MonacoCodeEditor = ({
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  // LeetCode layout for the main practice problem page
+  if (layout === "leetcode") {
+    return (
+      <div className="h-full flex flex-col bg-white">
+        <LeetCodeEditorHeader 
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
+        />
+
+        {/* Code Editor */}
+        <div className="flex-1 min-h-0">
+          <Editor
+            height="100%"
+            language={selectedLanguage === 'cpp' ? 'cpp' : selectedLanguage}
+            theme="light"
+            value={code}
+            onChange={(value) => saveCode(value || "")}
+            options={{
+              fontSize: 14,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              automaticLayout: true,
+              tabSize: 2,
+              insertSpaces: true,
+              renderLineHighlight: 'line',
+              lineNumbers: 'on',
+              folding: true,
+              bracketMatching: 'always',
+              autoIndent: 'full',
+              formatOnPaste: true,
+              formatOnType: true
+            }}
+            onMount={(editor) => {
+              editorRef.current = editor;
+            }}
+          />
+        </div>
+
+        <EditorControls
+          customInput={customInput}
+          onCustomInputChange={setCustomInput}
+          onRun={onRun}
+          onSubmit={onSubmit}
+          isRunning={isRunning}
+          isSubmitting={isSubmitting}
+          isSolved={isSolved}
+          layout="leetcode"
+        />
+
+        <OutputSection
+          output={output}
+          testResults={testResults}
+          layout="leetcode"
+        />
+      </div>
+    );
+  }
 
   // Compact layout for the right sidebar
   if (layout === "compact") {
