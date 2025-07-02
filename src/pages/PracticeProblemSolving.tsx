@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { problems, Problem } from "@/data/practiceProblems";
 import PracticeProblemHeader from "@/components/practiceProblems/PracticeProblemHeader";
 import ProblemNotFound from "@/components/practiceProblems/ProblemNotFound";
-import CodeCompiler from "@/components/compiler/CodeCompiler";
+import MonacoCodeEditor from "@/components/compiler/MonacoCodeEditor";
 
 const PracticeProblemSolving = () => {
   const { problemId } = useParams<{ problemId: string }>();
@@ -19,7 +19,6 @@ const PracticeProblemSolving = () => {
 
   const handleSubmissionSuccess = () => {
     setIsSolved(true);
-    // In a real app, you would save the solved status to backend/localStorage
     localStorage.setItem(`problem_${problemId}_solved`, 'true');
   };
 
@@ -33,7 +32,7 @@ const PracticeProblemSolving = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6 h-[calc(100vh-80px)]">
-        <CodeCompiler
+        <MonacoCodeEditor
           problemTitle={problem.title}
           problemStatement={problem.description}
           difficulty={problem.difficulty}

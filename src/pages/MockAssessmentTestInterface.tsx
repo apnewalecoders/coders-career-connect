@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { X, Clock, FileText, AlertCircle, CheckCircle } from "lucide-react";
 import CodeCompiler from "@/components/compiler/CodeCompiler";
+import MonacoCodeEditor from "@/components/editor/MonacoCodeEditor";
 
 const mockProblems = [
   {
@@ -287,9 +287,9 @@ const MockAssessmentTestInterface = () => {
         </AlertDialog>
       </div>
 
-      {/* Main Content - Code Compiler */}
+      {/* Main Content - Monaco Code Editor */}
       <div className="flex-1">
-        <CodeCompiler
+        <MonacoCodeEditor
           problemTitle={currentProblem.title}
           problemStatement={currentProblem.statement}
           difficulty={currentProblem.difficulty}
