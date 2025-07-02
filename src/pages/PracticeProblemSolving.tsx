@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { problems, Problem } from "@/data/practiceProblems";
 import PracticeProblemHeader from "@/components/practiceProblems/PracticeProblemHeader";
 import ProblemNotFound from "@/components/practiceProblems/ProblemNotFound";
-import MonacoCodeEditor from "@/components/compiler/MonacoCodeEditor";
+import MonacoCodeEditor from "@/components/editor/MonacoCodeEditor";
 
 const PracticeProblemSolving = () => {
   const { problemId } = useParams<{ problemId: string }>();

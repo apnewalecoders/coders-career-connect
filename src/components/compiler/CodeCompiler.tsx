@@ -1,5 +1,5 @@
 
-import MonacoCodeEditor from "./MonacoCodeEditor";
+import MonacoCodeEditor from "../editor/MonacoCodeEditor";
 
 interface TestCase {
   input: string;
