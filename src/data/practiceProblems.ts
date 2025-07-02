@@ -12,6 +12,9 @@ export interface Problem {
   tags: string[];
   difficulty: string;
   testCases: TestCase[];
+  constraints?: string;
+  companies?: string[];
+  topics?: string[];
 }
 
 export const problems: Problem[] = [
@@ -53,7 +56,10 @@ Return the indices of the two numbers that add up to the target.`,
       { input: "4\n2 7 11 15\n9", expectedOutput: "[0, 1]" },
       { input: "3\n3 2 4\n6", expectedOutput: "[1, 2]" },
       { input: "2\n3 3\n6", expectedOutput: "[0, 1]" }
-    ]
+    ],
+    constraints: "• 2 ≤ nums.length ≤ 10⁴\n• -10⁹ ≤ nums[i] ≤ 10⁹\n• -10⁹ ≤ target ≤ 10⁹\n• Only one valid answer exists.",
+    companies: ["Google", "Amazon", "Microsoft"],
+    topics: ["Array", "Hash Table"]
   },
   {
     id: 2,
@@ -93,6 +99,9 @@ Return the length of the longest substring without repeating characters.`,
       { input: "bbbbb", expectedOutput: "1" },
       { input: "pwwkew", expectedOutput: "3" },
       { input: "", expectedOutput: "0" }
-    ]
+    ],
+    constraints: "• 0 ≤ s.length ≤ 5 * 10⁴\n• s consists of English letters, digits, symbols and spaces.",
+    companies: ["Amazon", "Microsoft", "Facebook"],
+    topics: ["String", "Sliding Window", "Hash Table"]
   }
 ];
