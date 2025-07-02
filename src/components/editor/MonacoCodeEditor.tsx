@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ interface EditorProps {
   isFullScreen?: boolean;
   showTimer?: boolean;
   timeLeft?: number;
+  layout?: "default" | "compact" | "mobile";
 }
 
 interface TestResult {
@@ -124,7 +124,8 @@ const MonacoCodeEditor = ({
   onSubmissionSuccess,
   isFullScreen = false,
   showTimer = false,
-  timeLeft = 0
+  timeLeft = 0,
+  layout = "default"
 }: EditorProps) => {
   const { toast } = useToast();
   const [selectedLanguage, setSelectedLanguage] = useState("python");
@@ -403,6 +404,153 @@ const MonacoCodeEditor = ({
     setIsDarkMode(!isDarkMode);
   };
 
+  // Compact layout for the right sidebar
+  if (layout === "compact") {
+    return (
+      <div className="h-full flex flex-col bg-[#1e1e1e]">
+        {/* Language Selector */}
+        <div className="p-3 border-b border-[#3e3e42] bg-[#252526]">
+          <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+            <SelectTrigger className="w-full bg-[#3c3c3c] border-[#3e3e42] text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[#252526] border-[#3e3e42]">
+              {languages.map((lang) => (
+                <SelectItem key={lang.value} value={lang.value} className="text-white hover:bg-[#3c3c3c]">
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Code Editor */}
+        <div className="flex-1 min-h-[300px]">
+          <Editor
+            height="100%"
+            language={selectedLanguage === 'cpp' ? 'cpp' : selectedLanguage}
+            theme="vs-dark"
+            value={code}
+            onChange={(value) => saveCode(value || "")}
+            options={{
+              fontSize: 13,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              automaticLayout: true,
+              tabSize: 2,
+              insertSpaces: true,
+              renderLineHighlight: 'line',
+              lineNumbers: 'on',
+              folding: true,
+              bracketMatching: 'always',
+              autoIndent: 'full',
+              formatOnPaste: true,
+              formatOnType: true
+            }}
+            onMount={(editor) => {
+              editorRef.current = editor;
+            }}
+          />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="p-3 border-t border-[#3e3e42] bg-[#252526]">
+          <div className="flex gap-2">
+            <Button
+              onClick={handleRun}
+              disabled={isRunning || isSolved}
+              variant="outline"
+              size="sm"
+              className="flex-1 bg-[#0e639c] hover:bg-[#1177bb] border-[#0e639c] text-white"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              {isRunning ? "Running..." : "Run"}
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting || isSolved}
+              size="sm"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Custom Input */}
+        <div className="p-3 border-t border-[#3e3e42] bg-[#252526]">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Custom Input
+          </label>
+          <Textarea
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            placeholder="Enter your test input here..."
+            className="h-20 font-mono text-sm bg-[#3c3c3c] border-[#3e3e42] text-white placeholder-gray-400 resize-none"
+            disabled={isSolved}
+          />
+        </div>
+
+        {/* Output Section */}
+        {(output || testResults.length > 0) && (
+          <div className="border-t border-[#3e3e42] bg-[#252526] p-3 max-h-64 overflow-y-auto">
+            {output && (
+              <div className="mb-4">
+                <h4 className="font-semibold text-gray-300 mb-2 text-sm">Output:</h4>
+                <pre className="bg-[#1e1e1e] text-green-400 p-3 rounded-md text-xs font-mono whitespace-pre-wrap border border-[#3e3e42]">
+                  {output}
+                </pre>
+              </div>
+            )}
+
+            {testResults.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-gray-300 mb-2 text-sm">Test Results:</h4>
+                <div className="space-y-2">
+                  {testResults.map((result, index) => (
+                    <div
+                      key={index}
+                      className={`p-2 rounded-lg border text-xs ${
+                        result.passed 
+                          ? 'bg-green-900/20 border-green-600/30' 
+                          : 'bg-red-900/20 border-red-600/30'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          {result.passed ? (
+                            <CheckCircle className="h-3 w-3 text-green-400" />
+                          ) : (
+                            <XCircle className="h-3 w-3 text-red-400" />
+                          )}
+                          <span className="font-medium text-white">
+                            Test {result.testCase}: {result.passed ? "Passed" : "Failed"}
+                          </span>
+                        </div>
+                        <div className="text-gray-400">
+                          {result.executionTime?.toFixed(2)}ms
+                        </div>
+                      </div>
+                      {!result.passed && (
+                        <div className="text-gray-300 space-y-1">
+                          <div><strong>Expected:</strong> {result.expectedOutput}</div>
+                          <div><strong>Got:</strong> {result.actualOutput}</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Default layout (existing full layout)
   return (
     <div className={`flex flex-col h-full ${isFullScreen ? 'fixed inset-0 bg-white z-50' : ''}`}>
       {/* Header */}

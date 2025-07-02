@@ -31,7 +31,7 @@ const PracticeProblemSolving = () => {
 
   if (!problem) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#1e1e1e] text-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold">Problem Not Found</h1>
           <Button onClick={handleExit} variant="outline">
@@ -52,9 +52,9 @@ const PracticeProblemSolving = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-[#1e1e1e] text-white">
       {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+      <div className="bg-[#2d2d30] border-b border-[#3e3e42] px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold text-white">{problem.title}</h1>
@@ -80,10 +80,10 @@ const PracticeProblemSolving = () => {
       {/* Main Content */}
       <div className="flex h-[calc(100vh-80px)]">
         {/* Left Panel - Problem Statement (70%) */}
-        <div className="w-full lg:w-[70%] bg-gray-900 border-r border-gray-700 overflow-y-auto">
+        <div className="w-full lg:w-[70%] bg-[#1e1e1e] border-r border-[#3e3e42] overflow-y-auto">
           <div className="p-6 space-y-6">
             {/* Problem Statement */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-[#252526] border-[#3e3e42]">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   Problem Statement
@@ -97,7 +97,7 @@ const PracticeProblemSolving = () => {
             </Card>
 
             {/* Sample Test Cases */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-[#252526] border-[#3e3e42]">
               <CardHeader>
                 <CardTitle className="text-white">Sample Test Cases</CardTitle>
               </CardHeader>
@@ -105,19 +105,19 @@ const PracticeProblemSolving = () => {
                 {problem.testCases?.slice(0, 2).map((testCase, index) => (
                   <div key={index} className="space-y-2">
                     <h4 className="text-sm font-semibold text-blue-400">
-                      Sample Input {index}:
+                      Sample Input {index + 1}:
                     </h4>
-                    <div className="bg-gray-900 p-3 rounded-lg font-mono text-sm text-gray-300">
+                    <div className="bg-[#1e1e1e] p-3 rounded-lg font-mono text-sm text-gray-300 border border-[#3e3e42]">
                       {testCase.input}
                     </div>
                     <h4 className="text-sm font-semibold text-green-400">
-                      Sample Output {index}:
+                      Sample Output {index + 1}:
                     </h4>
-                    <div className="bg-gray-900 p-3 rounded-lg font-mono text-sm text-gray-300">
+                    <div className="bg-[#1e1e1e] p-3 rounded-lg font-mono text-sm text-gray-300 border border-[#3e3e42]">
                       {testCase.expectedOutput}
                     </div>
                     {index < problem.testCases.slice(0, 2).length - 1 && (
-                      <hr className="border-gray-700" />
+                      <hr className="border-[#3e3e42]" />
                     )}
                   </div>
                 ))}
@@ -126,7 +126,7 @@ const PracticeProblemSolving = () => {
 
             {/* Constraints */}
             {problem.constraints && (
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-[#252526] border-[#3e3e42]">
                 <CardHeader>
                   <CardTitle className="text-white">Constraints</CardTitle>
                 </CardHeader>
@@ -139,14 +139,14 @@ const PracticeProblemSolving = () => {
             )}
 
             {/* Bottom Info */}
-            <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-700">
+            <div className="flex flex-wrap gap-4 pt-4 border-t border-[#3e3e42]">
               {/* Asked By */}
               <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-gray-400" />
                 <span className="text-sm text-gray-400">Asked By:</span>
                 <div className="flex gap-2">
                   {(problem.companies || ['Google', 'Microsoft']).map((company) => (
-                    <Badge key={company} variant="outline" className="text-xs border-gray-600 text-gray-300">
+                    <Badge key={company} variant="outline" className="text-xs border-[#3e3e42] text-gray-300">
                       {company}
                     </Badge>
                   ))}
@@ -159,7 +159,7 @@ const PracticeProblemSolving = () => {
                 <span className="text-sm text-gray-400">Topics:</span>
                 <div className="flex gap-2">
                   {(problem.topics || ['Array', 'Algorithms']).map((topic) => (
-                    <Badge key={topic} variant="outline" className="text-xs border-gray-600 text-gray-300">
+                    <Badge key={topic} variant="outline" className="text-xs border-[#3e3e42] text-gray-300">
                       {topic}
                     </Badge>
                   ))}
@@ -170,14 +170,17 @@ const PracticeProblemSolving = () => {
         </div>
 
         {/* Right Panel - Code Editor (30%) */}
-        <div className="hidden lg:block w-[30%] bg-gray-800">
-          <MonacoCodeEditor
-            problemTitle={problem.title}
-            problemStatement={problem.description}
-            difficulty={problem.difficulty}
-            testCases={problem.testCases}
-            onSubmissionSuccess={handleSubmissionSuccess}
-          />
+        <div className="hidden lg:block w-[30%] bg-[#1e1e1e] flex flex-col">
+          <div className="flex-1 overflow-hidden">
+            <MonacoCodeEditor
+              problemTitle={problem.title}
+              problemStatement={problem.description}
+              difficulty={problem.difficulty}
+              testCases={problem.testCases}
+              onSubmissionSuccess={handleSubmissionSuccess}
+              layout="compact"
+            />
+          </div>
         </div>
       </div>
 
@@ -189,6 +192,7 @@ const PracticeProblemSolving = () => {
           difficulty={problem.difficulty}
           testCases={problem.testCases}
           onSubmissionSuccess={handleSubmissionSuccess}
+          layout="mobile"
         />
       </div>
     </div>
