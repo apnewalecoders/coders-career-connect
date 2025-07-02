@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { X, Clock, FileText, AlertCircle, CheckCircle } from "lucide-react";
-import CodeCompiler from "@/components/compiler/CodeCompiler";
 import MonacoCodeEditor from "@/components/editor/MonacoCodeEditor";
 
 const mockProblems = [
@@ -157,6 +158,15 @@ const MockAssessmentTestInterface = () => {
     }
   };
 
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case "easy": return "bg-green-600 text-white";
+      case "medium": return "bg-yellow-600 text-white";
+      case "hard": return "bg-red-600 text-white";
+      default: return "bg-gray-600 text-white";
+    }
+  };
+
   if (showInstructions) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -231,64 +241,110 @@ const MockAssessmentTestInterface = () => {
   const currentProblem = mockProblems[currentQuestion];
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
-      {/* Top Bar */}
-      <div className="bg-gray-50 border-b px-6 py-4 flex flex-col items-center">
+    <div className="fixed inset-0 bg-gray-900 text-white z-50 flex flex-col">
+      {/* Header */}
+      <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold text-white">{currentProblem.title}</h1>
+            <Badge className={getDifficultyColor(currentProblem.difficulty)}>
+              {currentProblem.difficulty}
+            </Badge>
+            {submissions[currentQuestion] && (
+              <Badge className="bg-green-600 text-white">Solved ✓</Badge>
+            )}
+          </div>
+
+          {/* Timer - Center */}
+          <div className="flex items-center gap-2 bg-red-900 px-4 py-2 rounded-lg">
+            <Clock className="h-5 w-5 text-red-400" />
+            <span className="font-mono text-xl font-bold text-red-400">
+              {formatTime(timeLeft)}
+            </span>
+          </div>
+
+          {/* Exit Button */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" className="flex items-center gap-2">
+                <X className="h-4 w-4" />
+                Exit
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Exit Assessment?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to exit? Your progress will be saved but you won't be able to continue this session.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
+                  Exit Assessment
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+
         {/* Question Tabs */}
-        <div className="flex gap-2 mb-3">
+        <div className="flex justify-center gap-2 mt-4">
           {mockProblems.map((_, index) => (
             <button
               key={index}
               onClick={() => handleQuestionTab(index)}
-              className={`px-6 py-2 rounded-lg font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 index === currentQuestion
-                  ? 'bg-brand-red text-white shadow-md'
+                  ? 'bg-blue-600 text-white shadow-md'
                   : submissions[index]
-                  ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
-              {index + 1}
+              Problem {index + 1}
               {submissions[index] && ' ✓'}
             </button>
           ))}
         </div>
-        
-        {/* Timer */}
-        <div className="flex items-center gap-2 bg-red-50 px-4 py-2 rounded-lg">
-          <Clock className="h-5 w-5 text-red-500" />
-          <span className="font-mono text-xl font-bold text-red-600">
-            {formatTime(timeLeft)}
-          </span>
-        </div>
-
-        {/* Exit Button */}
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="absolute top-4 right-4 text-red-600 hover:text-red-700 hover:bg-red-50">
-              <X className="h-4 w-4 mr-1" />
-              Exit
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Exit Assessment?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to exit? Your progress will be saved but you won't be able to continue this session.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
-                Exit Assessment
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
 
-      {/* Main Content - Monaco Code Editor */}
-      <div className="flex-1">
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        {/* Left Panel - Problem Statement (70%) */}
+        <div className="w-full lg:w-[70%] bg-gray-900 border-r border-gray-700 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Problem Statement */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">Problem Statement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                  {currentProblem.statement}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Right Panel - Code Editor (30%) */}
+        <div className="hidden lg:block w-[30%] bg-gray-800">
+          <MonacoCodeEditor
+            problemTitle={currentProblem.title}
+            problemStatement={currentProblem.statement}
+            difficulty={currentProblem.difficulty}
+            testCases={currentProblem.testCases}
+            onSubmissionSuccess={handleSubmissionSuccess}
+            isFullScreen={true}
+            showTimer={true}
+            timeLeft={timeLeft}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Code Editor */}
+      <div className="lg:hidden">
         <MonacoCodeEditor
           problemTitle={currentProblem.title}
           problemStatement={currentProblem.statement}
