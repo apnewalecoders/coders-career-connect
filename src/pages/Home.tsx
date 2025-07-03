@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ArrowRight, FileText, Code, MessageSquare, Mail, Star } from "lucide-react";
+import { ArrowRight, FileText, Code, MessageSquare, Mail, Star, BookOpen, Brain, Target, Users, TrendingUp, Award } from "lucide-react";
 
 const Home = () => {
   const isMobile = useIsMobile();
@@ -25,10 +25,26 @@ const Home = () => {
     learners: 1100,
   };
 
+  // State for typing animation
+  const [typedText, setTypedText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const textToType = "Master DSA, Mock Tests, and Interview Prep";
+
+  // Typing animation effect
+  useEffect(() => {
+    if (currentIndex < textToType.length) {
+      const timeout = setTimeout(() => {
+        setTypedText(prev => prev + textToType[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, textToType]);
+
   // Animate counters when component mounts
   useEffect(() => {
-    const duration = 2000; // 2 seconds
-    const interval = 20; // Update every 20ms
+    const duration = 2000;
+    const interval = 20;
     const steps = duration / interval;
 
     const incrementValues = {
@@ -76,444 +92,382 @@ const Home = () => {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519389950473-47ba0277781c')] bg-cover bg-center opacity-20"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32 relative z-10">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Level Up Your Career with{" "}
-              <span className="text-brand-red">Apne Wale Coders</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-6">
-              Empowering Careers, One Step at a Time
-            </p>
-            <p className="text-lg mb-8 text-gray-200">
-              Expert guidance, mock interviews, and placement support to help you
-              succeed in your tech career journey.
-            </p>
-            <Link to="/services">
-              <Button
-                size="lg"
-                className="bg-brand-red hover:bg-red-600 text-white px-8 py-6 text-lg"
-              >
-                Book a Slot
-              </Button>
-            </Link>
+      {/* Hero Section with Animated Code Background */}
+      <section className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+        {/* Animated Code Background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 text-green-400 font-mono text-sm animate-pulse">
+            <div>function solveProblem() {'{'}  </div>
+            <div className="ml-4">let result = [];</div>
+            <div className="ml-4">for (let i = 0; i &lt; n; i++) {'{'}</div>
+            <div className="ml-8">result.push(i);</div>
+            <div className="ml-4">{'}'}</div>
+            <div>{'}'}</div>
+          </div>
+          <div className="absolute top-40 right-20 text-blue-400 font-mono text-sm animate-pulse delay-1000">
+            <div>const interview = () =&gt; {'{'}  </div>
+            <div className="ml-4">prepare();</div>
+            <div className="ml-4">practice();</div>
+            <div className="ml-4">succeed();</div>
+            <div>{'}'}</div>
+          </div>
+          <div className="absolute bottom-40 left-1/4 text-purple-400 font-mono text-sm animate-pulse delay-2000">
+            <div>class DSA {'{'}  </div>
+            <div className="ml-4">constructor() {'{'}</div>
+            <div className="ml-8">this.skills = 'advanced';</div>
+            <div className="ml-4">{'}'}</div>
+            <div>{'}'}</div>
           </div>
         </div>
-      </section>
 
-      {/* Our Services */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Services</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We provide comprehensive career development services tailored to
-              help tech professionals at every stage of their career journey.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Resume Building */}
-            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="rounded-full bg-red-100 w-12 h-12 flex items-center justify-center mb-6">
-                <FileText className="text-brand-red" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Resume Building</h3>
-              <p className="text-gray-600 mb-4">
-                Professional resume crafting services to highlight your skills and
-                experience effectively and pass ATS screening.
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="mb-8">
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                {typedText}
+                <span className="animate-pulse">|</span>
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
+                Empowering your tech career with comprehensive coding practice, mock interviews, and expert guidance
               </p>
-              <Link to="/services" className="text-brand-red font-medium inline-flex items-center">
-                Learn more <ArrowRight size={16} className="ml-1" />
-              </Link>
-            </div>
-
-            {/* Web Design & Development */}
-            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="rounded-full bg-red-100 w-12 h-12 flex items-center justify-center mb-6">
-                <Code className="text-brand-red" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                Web Design & Development
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Expert guidance on web technologies and hands-on project
-                assistance to build a compelling portfolio.
-              </p>
-              <Link to="/services" className="text-brand-red font-medium inline-flex items-center">
-                Learn more <ArrowRight size={16} className="ml-1" />
-              </Link>
-            </div>
-
-            {/* Mock Interviews */}
-            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="rounded-full bg-red-100 w-12 h-12 flex items-center justify-center mb-6">
-                <MessageSquare className="text-brand-red" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Mock Interviews</h3>
-              <p className="text-gray-600 mb-4">
-                Realistic interview simulations with detailed feedback to prepare
-                you for technical and behavioral questions.
-              </p>
-              <Link to="/services" className="text-brand-red font-medium inline-flex items-center">
-                Learn more <ArrowRight size={16} className="ml-1" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <Link to="/services">
-              <Button variant="outline" className="px-8">
-                View All Services <ArrowRight size={16} className="ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Strength in Numbers */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Strength in Numbers</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Our impact in helping tech professionals achieve their career goals.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="text-brand-red font-bold text-4xl mb-2 animate-count-up">
-                {formatNumber(counters.subscribers)}+
-              </div>
-              <p className="text-gray-700">Subscribers</p>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="text-brand-red font-bold text-4xl mb-2 animate-count-up">
-                {formatNumber(counters.views)}+
-              </div>
-              <p className="text-gray-700">Content Views</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/mock-test">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-6 text-lg transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  🔍 Explore Tests
+                </Button>
+              </Link>
+              <Link to="/practice-problems">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-lg transform hover:scale-105 transition-all duration-300"
+                >
+                  🧠 Start Practicing
+                </Button>
+              </Link>
             </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="text-brand-red font-bold text-4xl mb-2 animate-count-up">
-                {formatNumber(counters.interviews)}+
-              </div>
-              <p className="text-gray-700">Mock Interviews</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <div className="text-brand-red font-bold text-4xl mb-2 animate-count-up">
-                {formatNumber(counters.learners)}+
-              </div>
-              <p className="text-gray-700">Learners Helped</p>
-            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-ping"></div>
           </div>
         </div>
       </section>
 
-      {/* Featured Jobs */}
-      <section className="py-16 bg-white">
+      {/* Features Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Featured Jobs</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Exclusive job opportunities for tech professionals.
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              Platform Features
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to excel in your coding interviews and technical assessments
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Job Card 1 */}
-            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-2">
-                Frontend Developer
-              </h3>
-              <p className="text-brand-red mb-1">Google</p>
-              <p className="text-gray-600 mb-4">Bangalore, India</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  React
-                </span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  3+ Years
-                </span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  Full-time
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Mock Tests */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+              <div className="rounded-full bg-gradient-to-r from-blue-100 to-blue-200 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Target className="text-blue-600 w-8 h-8" />
               </div>
-              <Link to="/jobs" className="text-brand-red font-medium inline-flex items-center">
-                View Details <ArrowRight size={16} className="ml-1" />
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Mock Tests</h3>
+              <p className="text-gray-600 mb-6">
+                Comprehensive practice tests that simulate real coding interviews with detailed analytics
+              </p>
+              <Link to="/mock-test" className="text-blue-600 font-semibold inline-flex items-center group-hover:text-blue-700">
+                Start Testing <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
 
-            {/* Job Card 2 */}
-            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-2">
-                Data Scientist
-              </h3>
-              <p className="text-brand-red mb-1">Microsoft</p>
-              <p className="text-gray-600 mb-4">Hyderabad, India</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  Python
-                </span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  4+ Years
-                </span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  Full-time
-                </span>
+            {/* Mock Assessments */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+              <div className="rounded-full bg-gradient-to-r from-green-100 to-green-200 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Award className="text-green-600 w-8 h-8" />
               </div>
-              <Link to="/jobs" className="text-brand-red font-medium inline-flex items-center">
-                View Details <ArrowRight size={16} className="ml-1" />
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Mock Assessments</h3>
+              <p className="text-gray-600 mb-6">
+                Skill-based assessments to evaluate your technical competency and readiness
+              </p>
+              <Link to="/mock-assessment" className="text-green-600 font-semibold inline-flex items-center group-hover:text-green-700">
+                Take Assessment <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
 
-            {/* Job Card 3 */}
-            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-              <h3 className="text-xl font-semibold mb-2">
-                Backend Engineer
-              </h3>
-              <p className="text-brand-red mb-1">Amazon</p>
-              <p className="text-gray-600 mb-4">Remote</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  Node.js
-                </span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  5+ Years
-                </span>
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                  Full-time
-                </span>
+            {/* Practice Problems */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+              <div className="rounded-full bg-gradient-to-r from-purple-100 to-purple-200 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Code className="text-purple-600 w-8 h-8" />
               </div>
-              <Link to="/jobs" className="text-brand-red font-medium inline-flex items-center">
-                View Details <ArrowRight size={16} className="ml-1" />
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Practice Problems</h3>
+              <p className="text-gray-600 mb-6">
+                Curated coding challenges from easy to advanced levels with detailed solutions
+              </p>
+              <Link to="/practice-problems" className="text-purple-600 font-semibold inline-flex items-center group-hover:text-purple-700">
+                Start Coding <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-          </div>
 
-          <div className="text-center mt-12">
-            <Link to="/jobs">
-              <Button variant="outline" className="px-8">
-                View All Jobs <ArrowRight size={16} className="ml-2" />
-              </Button>
-            </Link>
+            {/* Interview Prep */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
+              <div className="rounded-full bg-gradient-to-r from-red-100 to-red-200 w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <MessageSquare className="text-brand-red w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Interview Prep</h3>
+              <p className="text-gray-600 mb-6">
+                Mock interviews with real-time feedback and behavioral question practice
+              </p>
+              <Link to="/interview-preparation" className="text-brand-red font-semibold inline-flex items-center group-hover:text-red-600">
+                Prepare Now <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Recent Blogs */}
-      <section className="py-16 bg-gray-50">
+      {/* Study Material Section */}
+      <section className="py-20 bg-gray-900 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Recent Blogs</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Insights, tips, and guides to help you navigate your tech career.
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Study Material
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Comprehensive resources to accelerate your learning journey
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Blog 1 */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gray-300 relative">
-                <img
-                  src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
-                  alt="How to Ace Technical Interviews"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  How to Ace Technical Interviews
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Master the art of technical interviews with our comprehensive guide
-                  covering algorithms, system design, and soft skills.
-                </p>
-                <Link to="/blogs" className="text-brand-red font-medium inline-flex items-center">
-                  Read more <ArrowRight size={16} className="ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Blog 2 */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gray-300 relative">
-                <img
-                  src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
-                  alt="Frontend Trends in 2025"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  Frontend Trends in 2025
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Stay ahead of the curve with our analysis of emerging frontend
-                  technologies and practices that will shape web development.
-                </p>
-                <Link to="/blogs" className="text-brand-red font-medium inline-flex items-center">
-                  Read more <ArrowRight size={16} className="ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Blog 3 */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gray-300 relative">
-                <img
-                  src="https://images.unsplash.com/photo-1518770660439-4636190af475"
-                  alt="Building Your Portfolio"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  Building Your Portfolio
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Learn how to create a standout tech portfolio that showcases your
-                  skills and helps you land your dream job.
-                </p>
-                <Link to="/blogs" className="text-brand-red font-medium inline-flex items-center">
-                  Read more <ArrowRight size={16} className="ml-1" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <Link to="/blogs">
-              <Button variant="outline" className="px-8">
-                View All Blogs <ArrowRight size={16} className="ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Subscribe Box */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-50 rounded-xl p-8 lg:p-12 shadow-lg">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div className="max-w-lg">
-                <div className="rounded-full bg-red-100 w-12 h-12 flex items-center justify-center mb-6">
-                  <Mail className="text-brand-red" />
+            {/* Study Card 1 */}
+            <div className="group bg-gradient-to-br from-gray-800 to-gray-700 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+              <div className="h-48 bg-gradient-to-br from-blue-600 to-blue-800 relative overflow-hidden">
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                <div className="absolute bottom-4 left-4">
+                  <BookOpen className="text-white w-8 h-8" />
                 </div>
-                <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
-                <p className="text-gray-600">
-                  Subscribe to our newsletter for career tips, job opportunities, and
-                  exclusive resources to accelerate your tech career growth.
-                </p>
               </div>
-
-              <div className="w-full lg:w-auto">
-                <form className="flex flex-col sm:flex-row gap-4 w-full">
-                  <input
-                    type="email"
-                    placeholder="Your email address"
-                    className="flex-grow px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent"
-                    required
-                  />
-                  <Button type="submit" className="bg-brand-red hover:bg-red-600 text-white px-6">
-                    Subscribe
-                  </Button>
-                </form>
-                <p className="text-xs text-gray-500 mt-2">
-                  We respect your privacy. Unsubscribe at any time.
+              <div className="p-6">
+                <h3 className="text-2xl font-bold mb-3">Top 50 DSA Questions</h3>
+                <p className="text-gray-300 mb-4">
+                  Master the most frequently asked data structure and algorithm questions in technical interviews.
                 </p>
+                <Link to="/study-material">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white group-hover:scale-105 transition-transform">
+                    Read More
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Study Card 2 */}
+            <div className="group bg-gradient-to-br from-gray-800 to-gray-700 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+              <div className="h-48 bg-gradient-to-br from-green-600 to-green-800 relative overflow-hidden">
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                <div className="absolute bottom-4 left-4">
+                  <Brain className="text-white w-8 h-8" />
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold mb-3">System Design Guide</h3>
+                <p className="text-gray-300 mb-4">
+                  Learn scalable system architecture patterns and design principles for senior roles.
+                </p>
+                <Link to="/study-material">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white group-hover:scale-105 transition-transform">
+                    Read More
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Study Card 3 */}
+            <div className="group bg-gradient-to-br from-gray-800 to-gray-700 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+              <div className="h-48 bg-gradient-to-br from-purple-600 to-purple-800 relative overflow-hidden">
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                <div className="absolute bottom-4 left-4">
+                  <TrendingUp className="text-white w-8 h-8" />
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold mb-3">Behavioral Interview Tips</h3>
+                <p className="text-gray-300 mb-4">
+                  Master the STAR method and ace behavioral questions with confidence and clarity.
+                </p>
+                <Link to="/study-material">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white group-hover:scale-105 transition-transform">
+                    Read More
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Student Reviews */}
-      <section className="py-16 bg-gray-50">
+      {/* Stats Section */}
+      <section className="py-20 bg-gradient-to-r from-brand-red to-red-600 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Student Reviews</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Hear from our students who have successfully transitioned into their
-              dream tech careers.
+            <h2 className="text-4xl font-bold mb-4">Our Impact</h2>
+            <p className="text-xl text-red-100 max-w-2xl mx-auto">
+              Helping thousands of developers achieve their career goals
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Review 1 */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center mb-4">
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center group">
+              <div className="bg-white bg-opacity-20 rounded-2xl p-8 backdrop-blur-sm group-hover:bg-opacity-30 transition-all duration-300">
+                <div className="text-5xl font-bold mb-2">
+                  {formatNumber(counters.subscribers)}+
+                </div>
+                <p className="text-red-100 text-lg">Happy Learners</p>
               </div>
-              <p className="text-gray-600 mb-4">
-                "The mock interview sessions were incredibly helpful. The feedback
-                was detailed and constructive, which helped me improve significantly.
-                I landed my dream job at Google!"
+            </div>
+            
+            <div className="text-center group">
+              <div className="bg-white bg-opacity-20 rounded-2xl p-8 backdrop-blur-sm group-hover:bg-opacity-30 transition-all duration-300">
+                <div className="text-5xl font-bold mb-2">
+                  {formatNumber(counters.views)}+
+                </div>
+                <p className="text-red-100 text-lg">Problems Solved</p>
+              </div>
+            </div>
+            
+            <div className="text-center group">
+              <div className="bg-white bg-opacity-20 rounded-2xl p-8 backdrop-blur-sm group-hover:bg-opacity-30 transition-all duration-300">
+                <div className="text-5xl font-bold mb-2">
+                  {formatNumber(counters.interviews)}+
+                </div>
+                <p className="text-red-100 text-lg">Mock Interviews</p>
+              </div>
+            </div>
+            
+            <div className="text-center group">
+              <div className="bg-white bg-opacity-20 rounded-2xl p-8 backdrop-blur-sm group-hover:bg-opacity-30 transition-all duration-300">
+                <div className="text-5xl font-bold mb-2">
+                  {formatNumber(counters.learners)}+
+                </div>
+                <p className="text-red-100 text-lg">Success Stories</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">What Our Students Say</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Real feedback from developers who transformed their careers with us
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="text-yellow-400 w-5 h-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-6 text-lg">
+                "The mock interviews were incredibly realistic. I felt fully prepared for my Google interview and landed the job!"
               </p>
               <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-gray-300 mr-3"></div>
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold mr-4">
+                  P
+                </div>
                 <div>
-                  <p className="font-semibold">Priya Sharma</p>
-                  <p className="text-sm text-gray-500">Frontend Developer</p>
+                  <p className="font-bold text-gray-900">Priya Sharma</p>
+                  <p className="text-gray-600">Software Engineer @ Google</p>
                 </div>
               </div>
             </div>
 
-            {/* Review 2 */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center mb-4">
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
+            {/* Testimonial 2 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="text-yellow-400 w-5 h-5 fill-current" />
+                ))}
               </div>
-              <p className="text-gray-600 mb-4">
-                "The resume building service transformed my CV completely. I started
-                getting calls from recruiters within weeks of updating my profile.
-                Thank you Apne Wale Coders!"
+              <p className="text-gray-700 mb-6 text-lg">
+                "The DSA practice problems are top-notch. Perfect difficulty progression from beginner to advanced."
               </p>
               <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-gray-300 mr-3"></div>
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-white font-bold mr-4">
+                  R
+                </div>
                 <div>
-                  <p className="font-semibold">Rajesh Kumar</p>
-                  <p className="text-sm text-gray-500">Data Scientist</p>
+                  <p className="font-bold text-gray-900">Rajesh Kumar</p>
+                  <p className="text-gray-600">Data Scientist @ Microsoft</p>
                 </div>
               </div>
             </div>
 
-            {/* Review 3 */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex items-center mb-4">
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
-                <Star className="text-yellow-400 w-5 h-5" />
+            {/* Testimonial 3 */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="text-yellow-400 w-5 h-5 fill-current" />
+                ))}
               </div>
-              <p className="text-gray-600 mb-4">
-                "The guidance I received for my portfolio project was invaluable. The
-                mentors are experienced professionals who provide practical insights
-                and industry best practices."
+              <p className="text-gray-700 mb-6 text-lg">
+                "Amazing platform! The system design resources helped me crack my senior engineer interview."
               </p>
               <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-gray-300 mr-3"></div>
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold mr-4">
+                  A
+                </div>
                 <div>
-                  <p className="font-semibold">Ananya Patel</p>
-                  <p className="text-sm text-gray-500">Full Stack Developer</p>
+                  <p className="font-bold text-gray-900">Ananya Patel</p>
+                  <p className="text-gray-600">Senior Engineer @ Amazon</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 to-black text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready to Transform Your Career?
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Join thousands of developers who have successfully landed their dream jobs with our comprehensive preparation platform.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/sign-up">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-6 text-lg transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Start Your Journey
+                </Button>
+              </Link>
+              <Link to="/services">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-6 text-lg transform hover:scale-105 transition-all duration-300"
+                >
+                  Explore Services
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
