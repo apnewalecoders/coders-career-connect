@@ -165,221 +165,234 @@ const MockTestInterface = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Fixed Header */}
-        <div className="sticky top-16 z-40 bg-white border-b shadow-sm">
-          <div className="px-4 py-3">
-            {/* Top Header Row */}
-            <div className="flex items-center justify-between mb-4">
+      <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              {/* Title and Info */}
               <div className="flex-1">
-                <h1 className="text-lg md:text-xl font-bold text-gray-900 truncate">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
                   Mock Test #{testId}
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  Question {currentQuestion + 1} of {mockQuestions.length}
+                <p className="text-sm md:text-base text-gray-600">
+                  Question {currentQuestion + 1} of {mockQuestions.length} • 
+                  Answered: {answeredCount}/{mockQuestions.length}
                 </p>
               </div>
               
-              {/* Timer */}
-              <div className="flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg mx-4">
-                <Clock className="h-4 w-4 text-red-500" />
-                <span className="font-mono text-lg font-bold text-red-600">
-                  {formatTime(timeLeft)}
-                </span>
-              </div>
-
-              {/* Exit Button */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300">
-                    <X className="h-4 w-4" />
-                    <span className="hidden sm:inline ml-1">Exit</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Exit Test?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to exit? Your progress will be saved but you won't be able to continue this session.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
-                      Exit Test
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-
-            {/* Question Navigation - Horizontally Scrollable */}
-            <div className="relative">
-              <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
-                {mockQuestions.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuestionNavigation(index)}
-                    className={`flex-shrink-0 w-10 h-10 rounded-lg font-medium text-sm transition-all duration-200 hover:scale-105 active:scale-95 ${
-                      getStatusColor(getQuestionStatus(index), currentQuestion === index)
-                    }`}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Progress Indicators */}
-              <div className="flex justify-between text-xs text-gray-600 mt-2">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-green-500 rounded"></div>
-                    <span>Answered: {answeredCount}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                    <span>Seen: {seenQuestions.size - answeredCount}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-gray-300 rounded"></div>
-                    <span>Unseen: {mockQuestions.length - seenQuestions.size}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="px-4 py-6">
-          <Card className="max-w-4xl mx-auto">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl md:text-2xl text-gray-900 leading-relaxed">
-                {mockQuestions[currentQuestion].question}
-              </CardTitle>
-            </CardHeader>
-            
-            <CardContent className="space-y-6">
-              {/* Options */}
-              <RadioGroup 
-                value={answers[currentQuestion]?.toString() || ""} 
-                onValueChange={handleAnswerSelect}
-                className="space-y-4"
-              >
-                {mockQuestions[currentQuestion].options.map((option, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-start space-x-4 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:shadow-md active:scale-[0.98] ${
-                      answers[currentQuestion] === index 
-                        ? 'border-blue-500 bg-blue-50 shadow-sm' 
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                    onClick={() => handleAnswerSelect(index.toString())}
-                  >
-                    <RadioGroupItem 
-                      value={index.toString()} 
-                      id={`option-${index}`} 
-                      className="mt-1 flex-shrink-0"
-                    />
-                    <label 
-                      htmlFor={`option-${index}`} 
-                      className="flex-1 cursor-pointer text-gray-700 leading-relaxed text-base"
-                    >
-                      <span className="font-medium text-gray-900 mr-2">
-                        {String.fromCharCode(65 + index)}.
-                      </span>
-                      {option}
-                    </label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Fixed Bottom Navigation */}
-        <div className="sticky bottom-0 bg-white border-t shadow-lg">
-          <div className="px-4 py-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3">
-                {/* Navigation Buttons */}
-                <div className="flex gap-3 flex-1">
-                  <Button
-                    variant="outline"
-                    onClick={handlePrevious}
-                    disabled={currentQuestion === 0}
-                    className="flex-1 sm:flex-none sm:min-w-[120px] h-12 text-base"
-                  >
-                    <ChevronLeft className="h-5 w-5 mr-2" />
-                    Previous
-                  </Button>
-                  
-                  <Button
-                    onClick={handleNext}
-                    disabled={currentQuestion === mockQuestions.length - 1}
-                    className="flex-1 sm:flex-none sm:min-w-[120px] h-12 text-base bg-blue-600 hover:bg-blue-700"
-                  >
-                    Next
-                    <ChevronRight className="h-5 w-5 ml-2" />
-                  </Button>
+              {/* Timer and Exit */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg">
+                  <Clock className="h-4 w-4 text-red-500" />
+                  <span className="font-mono text-lg font-bold text-red-600">
+                    {formatTime(timeLeft)}
+                  </span>
                 </div>
 
-                {/* Submit Button */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button
-                      className="w-full sm:w-auto sm:min-w-[140px] h-12 text-base bg-green-600 hover:bg-green-700 text-white"
-                      disabled={isSubmitting}
-                    >
-                      <Flag className="h-5 w-5 mr-2" />
-                      Submit Test
+                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300">
+                      <X className="h-4 w-4 mr-1" />
+                      <span className="hidden sm:inline">Exit</span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Submit Test?</AlertDialogTitle>
+                      <AlertDialogTitle>Exit Test?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to submit your test? You have answered {answeredCount} out of {mockQuestions.length} questions.
-                        This action cannot be undone.
+                        Are you sure you want to exit? Your progress will be saved but you won't be able to continue this session.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Review Again</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
-                        Submit Test
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
+                        Exit Test
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
+            </div>
+          </div>
 
-              {/* Progress Bar */}
-              <div className="mt-4">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Progress: {answeredCount}/{mockQuestions.length}</span>
-                  <span>{Math.round((answeredCount / mockQuestions.length) * 100)}% Complete</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(answeredCount / mockQuestions.length) * 100}%` }}
-                  />
-                </div>
+          {/* Question Navigation */}
+          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-6">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Question Navigation</h3>
+            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-20 gap-2">
+              {mockQuestions.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleQuestionNavigation(index)}
+                  className={`h-10 w-full rounded-lg font-medium text-sm transition-all duration-200 hover:scale-105 active:scale-95 ${
+                    getStatusColor(getQuestionStatus(index), currentQuestion === index)
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+            
+            {/* Legend */}
+            <div className="flex flex-wrap gap-4 mt-4 text-xs text-gray-600">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-green-500 rounded"></div>
+                <span>Answered</span>
               </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                <span>Seen</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-gray-300 rounded"></div>
+                <span>Not Visited</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-blue-600 rounded"></div>
+                <span>Current</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Question Section */}
+            <div className="flex-1">
+              <Card className="h-full">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg md:text-xl text-gray-900 leading-relaxed">
+                    {mockQuestions[currentQuestion].question}
+                  </CardTitle>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <RadioGroup 
+                    value={answers[currentQuestion]?.toString() || ""} 
+                    onValueChange={handleAnswerSelect}
+                    className="space-y-3"
+                  >
+                    {mockQuestions[currentQuestion].options.map((option, index) => (
+                      <div 
+                        key={index} 
+                        className={`flex items-start space-x-3 p-3 md:p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:shadow-md active:scale-[0.98] ${
+                          answers[currentQuestion] === index 
+                            ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleAnswerSelect(index.toString())}
+                      >
+                        <RadioGroupItem 
+                          value={index.toString()} 
+                          id={`option-${index}`} 
+                          className="mt-1 flex-shrink-0"
+                        />
+                        <label 
+                          htmlFor={`option-${index}`} 
+                          className="flex-1 cursor-pointer text-gray-700 leading-relaxed text-sm md:text-base"
+                        >
+                          <span className="font-medium text-gray-900 mr-2">
+                            {String.fromCharCode(65 + index)}.
+                          </span>
+                          {option}
+                        </label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Progress and Navigation Panel */}
+            <div className="lg:w-80">
+              <Card className="sticky top-4">
+                <CardHeader>
+                  <CardTitle className="text-lg">Progress</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Progress Bar */}
+                  <div>
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>Completion</span>
+                      <span>{Math.round((answeredCount / mockQuestions.length) * 100)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${(answeredCount / mockQuestions.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={handlePrevious}
+                        disabled={currentQuestion === 0}
+                        className="flex-1 h-10"
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      
+                      <Button
+                        onClick={handleNext}
+                        disabled={currentQuestion === mockQuestions.length - 1}
+                        className="flex-1 h-10 bg-blue-600 hover:bg-blue-700"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="w-full h-10 bg-green-600 hover:bg-green-700 text-white"
+                          disabled={isSubmitting}
+                        >
+                          <Flag className="h-4 w-4 mr-2" />
+                          Submit Test
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Submit Test?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to submit your test? You have answered {answeredCount} out of {mockQuestions.length} questions.
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Review Again</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
+                            Submit Test
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+
+                  {/* Statistics */}
+                  <div className="pt-4 border-t">
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-green-600">{answeredCount}</div>
+                        <div className="text-xs text-gray-500">Answered</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-gray-400">{mockQuestions.length - answeredCount}</div>
+                        <div className="text-xs text-gray-500">Remaining</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </div>
-
-      <style>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </Layout>
   );
 };
