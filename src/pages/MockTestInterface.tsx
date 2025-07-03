@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -214,7 +215,7 @@ const MockTestInterface = () => {
 
             {/* Question Navigation - Horizontally Scrollable */}
             <div className="relative">
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
                 {mockQuestions.map((_, index) => (
                   <button
                     key={index}
@@ -370,12 +371,12 @@ const MockTestInterface = () => {
         </div>
       </div>
 
-      <style jsx>{`
-        .scrollbar-hide {
+      <style>{`
+        .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-        .scrollbar-hide::-webkit-scrollbar {
+        .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }
       `}</style>
