@@ -4,9 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Clock, ChevronLeft, ChevronRight, Flag } from "lucide-react";
+import { ChevronLeft, ChevronRight, Flag } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import MockTestTimer from "@/components/mockTest/components/MockTestTimer";
+import MockTestQuestionNavigation from "@/components/mockTest/components/MockTestQuestionNavigation";
+import MockTestQuestionDisplay from "@/components/mockTest/components/MockTestQuestionDisplay";
+import MockTestSummary from "@/components/mockTest/components/MockTestSummary";
 
 // Mock questions data
 const mockQuestions = [
@@ -77,13 +80,6 @@ const MockTestInterface = () => {
     }
   }, [timeLeft, isSubmitting]);
 
-  // Format time display
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   const handleAnswerSelect = (value: string) => {
     const answerIndex = parseInt(value);
     setAnswers(prev => ({
@@ -133,27 +129,7 @@ const MockTestInterface = () => {
     });
   };
 
-  const getQuestionStatus = (index: number) => {
-    if (answers.hasOwnProperty(index)) return 'answered';
-    if (seenQuestions.has(index)) return 'seen';
-    return 'unseen';
-  };
-
-  const getStatusColor = (status: string, isCurrent: boolean = false) => {
-    if (isCurrent) {
-      return 'bg-orange-500 text-white ring-2 ring-orange-300';
-    }
-    
-    switch (status) {
-      case 'answered': return 'bg-green-500 text-white hover:bg-green-600';
-      case 'seen': return 'bg-orange-500 text-white hover:bg-orange-600';
-      case 'unseen': return 'bg-gray-200 text-gray-700 hover:bg-gray-300';
-      default: return 'bg-gray-200 text-gray-700 hover:bg-gray-300';
-    }
-  };
-
   const answeredCount = Object.keys(answers).length;
-  const remainingCount = mockQuestions.length - answeredCount;
 
   return (
     <Layout>
@@ -165,10 +141,7 @@ const MockTestInterface = () => {
             <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
               <div className="flex items-center justify-between mb-3">
                 <h1 className="text-lg font-bold text-gray-900">Mock Test #{testId}</h1>
-                <div className="flex items-center gap-2 text-red-600">
-                  <Clock className="h-4 w-4" />
-                  <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
-                </div>
+                <MockTestTimer timeLeft={timeLeft} />
               </div>
               <p className="text-sm text-gray-600">
                 Question {currentQuestion + 1} of {mockQuestions.length}
@@ -178,58 +151,31 @@ const MockTestInterface = () => {
             {/* Mobile Question Navigation */}
             <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Questions</h3>
-              <div className="grid grid-cols-5 gap-2">
-                {mockQuestions.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuestionNavigation(index)}
-                    className={`h-10 rounded-lg font-medium text-sm transition-all ${
-                      getStatusColor(getQuestionStatus(index), currentQuestion === index)
-                    }`}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-              </div>
+              <MockTestQuestionNavigation
+                questions={mockQuestions}
+                currentQuestion={currentQuestion}
+                answers={answers}
+                seenQuestions={seenQuestions}
+                onQuestionNavigation={handleQuestionNavigation}
+              />
             </div>
 
             {/* Mobile Question */}
             <Card className="mb-4">
               <CardHeader>
                 <CardTitle className="text-base">
-                  {mockQuestions[currentQuestion].question}
+                  Question {currentQuestion + 1} of {mockQuestions.length}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup 
-                  value={answers[currentQuestion]?.toString() || ""} 
-                  onValueChange={handleAnswerSelect}
-                  className="space-y-3"
-                >
-                  {mockQuestions[currentQuestion].options.map((option, index) => (
-                    <div 
-                      key={index} 
-                      className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                        answers[currentQuestion] === index 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => handleAnswerSelect(index.toString())}
-                    >
-                      <RadioGroupItem 
-                        value={index.toString()} 
-                        id={`mobile-option-${index}`} 
-                        className="mt-1"
-                      />
-                      <label 
-                        htmlFor={`mobile-option-${index}`} 
-                        className="flex-1 cursor-pointer text-sm"
-                      >
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </RadioGroup>
+                <MockTestQuestionDisplay
+                  question={mockQuestions[currentQuestion]}
+                  currentQuestionIndex={currentQuestion}
+                  totalQuestions={mockQuestions.length}
+                  selectedAnswer={answers[currentQuestion]}
+                  onAnswerSelect={handleAnswerSelect}
+                  isMobile={true}
+                />
               </CardContent>
             </Card>
 
@@ -289,18 +235,14 @@ const MockTestInterface = () => {
                   <CardTitle className="text-lg">Questions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-4 gap-2 mb-6">
-                    {mockQuestions.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleQuestionNavigation(index)}
-                        className={`h-12 w-12 rounded-lg font-medium text-sm transition-all hover:scale-105 ${
-                          getStatusColor(getQuestionStatus(index), currentQuestion === index)
-                        }`}
-                      >
-                        {index + 1}
-                      </button>
-                    ))}
+                  <div className="mb-6">
+                    <MockTestQuestionNavigation
+                      questions={mockQuestions}
+                      currentQuestion={currentQuestion}
+                      answers={answers}
+                      seenQuestions={seenQuestions}
+                      onQuestionNavigation={handleQuestionNavigation}
+                    />
                   </div>
 
                   {/* Legend */}
@@ -329,46 +271,17 @@ const MockTestInterface = () => {
                   <CardTitle className="text-xl">
                     Question {currentQuestion + 1} of {mockQuestions.length}
                   </CardTitle>
-                  <div className="flex items-center gap-2 text-red-600">
-                    <Clock className="h-5 w-5" />
-                    <span className="font-mono text-xl font-bold">{formatTime(timeLeft)}</span>
-                  </div>
+                  <MockTestTimer timeLeft={timeLeft} />
                 </CardHeader>
                 
                 <CardContent className="space-y-6">
-                  <div className="text-lg leading-relaxed text-gray-900">
-                    {mockQuestions[currentQuestion].question}
-                  </div>
-
-                  <RadioGroup 
-                    value={answers[currentQuestion]?.toString() || ""} 
-                    onValueChange={handleAnswerSelect}
-                    className="space-y-4"
-                  >
-                    {mockQuestions[currentQuestion].options.map((option, index) => (
-                      <div 
-                        key={index} 
-                        className={`flex items-start space-x-4 p-4 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md ${
-                          answers[currentQuestion] === index 
-                            ? 'border-blue-500 bg-blue-50 shadow-sm' 
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                        onClick={() => handleAnswerSelect(index.toString())}
-                      >
-                        <RadioGroupItem 
-                          value={index.toString()} 
-                          id={`option-${index}`} 
-                          className="mt-1"
-                        />
-                        <label 
-                          htmlFor={`option-${index}`} 
-                          className="flex-1 cursor-pointer text-gray-700 leading-relaxed"
-                        >
-                          {option}
-                        </label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                  <MockTestQuestionDisplay
+                    question={mockQuestions[currentQuestion]}
+                    currentQuestionIndex={currentQuestion}
+                    totalQuestions={mockQuestions.length}
+                    selectedAnswer={answers[currentQuestion]}
+                    onAnswerSelect={handleAnswerSelect}
+                  />
 
                   {/* Navigation Buttons */}
                   <div className="flex justify-between pt-6">
@@ -397,64 +310,12 @@ const MockTestInterface = () => {
 
             {/* Right Panel - Test Summary */}
             <div className="w-80">
-              <Card className="sticky top-4">
-                <CardHeader>
-                  <CardTitle className="text-lg">Test Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Timer Display */}
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Clock className="h-5 w-5 text-red-500" />
-                    </div>
-                    <div className="text-3xl font-bold text-red-600 font-mono">
-                      {formatTime(timeLeft)}
-                    </div>
-                    <div className="text-sm text-gray-500">Time Remaining</div>
-                  </div>
-
-                  {/* Statistics */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Questions:</span>
-                      <span className="font-bold">{mockQuestions.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Answered:</span>
-                      <span className="font-bold text-green-600">{answeredCount}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Remaining:</span>
-                      <span className="font-bold text-red-600">{remainingCount}</span>
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button className="w-full bg-red-500 hover:bg-red-600 text-white h-12">
-                        <Flag className="h-4 w-4 mr-2" />
-                        Submit Test
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Submit Test?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to submit your test? You have answered {answeredCount} out of {mockQuestions.length} questions.
-                          This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Review Again</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleSubmit} className="bg-red-500 hover:bg-red-600">
-                          Submit Test
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </CardContent>
-              </Card>
+              <MockTestSummary
+                timeLeft={timeLeft}
+                totalQuestions={mockQuestions.length}
+                answeredCount={answeredCount}
+                onSubmit={handleSubmit}
+              />
             </div>
           </div>
         </div>
