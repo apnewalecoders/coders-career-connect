@@ -2,15 +2,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Clock, LogOut, Play, Send, RotateCcw, Sun, Moon } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import MockAssessmentHeader from "@/components/assessment/components/MockAssessmentHeader";
+import MockQuestionNavigation from "@/components/assessment/components/MockQuestionNavigation";
+import MockProblemDisplay from "@/components/assessment/components/MockProblemDisplay";
+import MockCodeEditorPanel from "@/components/assessment/components/MockCodeEditorPanel";
 
 const codingProblems = [
   {
@@ -95,12 +92,6 @@ const MockAssessmentInterface = () => {
     };
   }, []);
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const handleTimeUp = () => {
     navigate(`/mock-assessment/${assessmentId}/results`, {
       state: { timeExpired: true, submissions }
@@ -170,60 +161,18 @@ const MockAssessmentInterface = () => {
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col">
       {/* Fixed Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0 shadow-sm">
-        <div className="flex items-center justify-between max-w-full">
-          <h1 className="text-lg font-semibold text-gray-900">Mock Assessment #{assessmentId}</h1>
-          
-          <div className="flex items-center gap-2 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
-            <Clock className="h-5 w-5 text-red-600" />
-            <span className="font-mono text-xl font-bold text-red-600">
-              {formatTime(timeLeft)}
-            </span>
-          </div>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                <LogOut className="h-4 w-4 mr-2" />
-                Exit
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Exit Assessment?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to exit? Your progress will be saved.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
-                  Exit Assessment
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </div>
+      <MockAssessmentHeader 
+        assessmentId={assessmentId}
+        timeLeft={timeLeft}
+        onExit={handleExit}
+      />
 
       {/* Question Navigation Tabs */}
       <Tabs value={currentQuestionIndex.toString()} onValueChange={(value) => setCurrentQuestionIndex(parseInt(value))} className="flex-shrink-0">
-        <div className="bg-gray-50 border-b px-4 py-2">
-          <TabsList className="grid w-fit grid-cols-2">
-            <TabsTrigger value="0" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${submissions[0] ? 'bg-green-500' : 'bg-gray-300'}`} />
-                1
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="1" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${submissions[1] ? 'bg-green-500' : 'bg-gray-300'}`} />
-                2
-              </div>
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        <MockQuestionNavigation 
+          totalQuestions={codingProblems.length}
+          submissions={submissions}
+        />
 
         {/* Main Content */}
         <div className="flex-1 overflow-hidden">
@@ -231,45 +180,11 @@ const MockAssessmentInterface = () => {
             {/* Left Panel - Problem Description */}
             <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
               <div className="h-full overflow-y-auto p-6 bg-white">
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <h2 className="text-2xl font-bold text-gray-900">{currentProblem.title}</h2>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                        {currentProblem.difficulty}
-                      </span>
-                      {isCurrentSubmitted && (
-                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                          Submitted
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                      {currentProblem.statement}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Example</h3>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <div className="space-y-2">
-                        <div className="text-gray-700 whitespace-pre-line">
-                          {currentProblem.sampleInput}
-                        </div>
-                        <div className="text-gray-700 whitespace-pre-line">
-                          {currentProblem.sampleOutput}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Constraints</h3>
-                    <div className="text-gray-700 whitespace-pre-line bg-gray-50 p-3 rounded-lg">
-                      {currentProblem.constraints}
-                    </div>
-                  </div>
-                </div>
+                <MockProblemDisplay 
+                  problem={currentProblem}
+                  currentQuestionIndex={currentQuestionIndex}
+                  isSubmitted={isCurrentSubmitted}
+                />
               </div>
             </ResizablePanel>
 
@@ -277,114 +192,22 @@ const MockAssessmentInterface = () => {
 
             {/* Right Panel - Code Editor */}
             <ResizablePanel defaultSize={55} minSize={40}>
-              <div className="h-full flex flex-col bg-white">
-                {/* Editor Header */}
-                <div className="border-b border-gray-200 p-4 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">Code Editor</h3>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <Label htmlFor="language">Language:</Label>
-                        <Select value={language} onValueChange={setLanguage} disabled={isCurrentSubmitted}>
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="python">Python</SelectItem>
-                            <SelectItem value="java">Java</SelectItem>
-                            <SelectItem value="cpp">C++</SelectItem>
-                            <SelectItem value="javascript">JavaScript</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setDarkMode(!darkMode)}
-                        disabled={isCurrentSubmitted}
-                      >
-                        {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleReset}
-                        disabled={isCurrentSubmitted}
-                      >
-                        <RotateCcw className="h-4 w-4 mr-2" />
-                        Reset
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Code Editor */}
-                <div className="flex-1 min-h-0">
-                  <textarea
-                    value={codes[currentQuestionIndex]}
-                    onChange={(e) => handleCodeChange(e.target.value)}
-                    className={`w-full h-full p-4 font-mono text-sm border-0 resize-none focus:outline-none ${
-                      darkMode 
-                        ? 'bg-gray-900 text-gray-100' 
-                        : 'bg-white text-gray-900 border-t border-gray-200'
-                    }`}
-                    placeholder="Write your solution here..."
-                    disabled={isCurrentSubmitted}
-                    style={{ minHeight: '400px' }}
-                  />
-                </div>
-
-                {/* Controls */}
-                <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-4">
-                  <div>
-                    <Label htmlFor="custom-input" className="text-sm font-medium mb-2 block">
-                      Custom Input (Optional)
-                    </Label>
-                    <Input
-                      id="custom-input"
-                      value={customInput}
-                      onChange={(e) => setCustomInput(e.target.value)}
-                      placeholder="Enter custom test input..."
-                      className="font-mono text-sm"
-                      disabled={isCurrentSubmitted}
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleRun}
-                      disabled={isRunning || isCurrentSubmitted}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      {isRunning ? "Running..." : "Run"}
-                    </Button>
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isCurrentSubmitted}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      {isCurrentSubmitted ? "Submitted" : "Submit"}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Output Section */}
-                {output && (
-                  <div className="border-t border-gray-200 flex-shrink-0">
-                    <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                      <h4 className="font-medium text-gray-900">Output</h4>
-                    </div>
-                    <div className="p-4 max-h-48 overflow-y-auto">
-                      <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
-                        {output}
-                      </pre>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <MockCodeEditorPanel
+                language={language}
+                darkMode={darkMode}
+                code={codes[currentQuestionIndex]}
+                customInput={customInput}
+                output={output}
+                isRunning={isRunning}
+                isCurrentSubmitted={isCurrentSubmitted}
+                onLanguageChange={setLanguage}
+                onDarkModeToggle={() => setDarkMode(!darkMode)}
+                onCodeChange={handleCodeChange}
+                onCustomInputChange={setCustomInput}
+                onReset={handleReset}
+                onRun={handleRun}
+                onSubmit={handleSubmit}
+              />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
