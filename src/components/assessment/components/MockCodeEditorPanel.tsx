@@ -80,24 +80,37 @@ const MockCodeEditorPanel = ({
         </div>
       </div>
 
-      {/* Code Editor */}
-      <div className="flex-1 min-h-0">
+      {/* Code Editor - Takes remaining space except for controls */}
+      <div className="flex-1 min-h-0 flex flex-col">
         <textarea
           value={code}
           onChange={(e) => onCodeChange(e.target.value)}
-          className={`w-full h-full p-4 font-mono text-sm border-0 resize-none focus:outline-none ${
+          className={`flex-1 p-4 font-mono text-sm border-0 resize-none focus:outline-none ${
             darkMode 
               ? 'bg-gray-900 text-gray-100' 
-              : 'bg-white text-gray-900 border-t border-gray-200'
+              : 'bg-white text-gray-900'
           }`}
           placeholder="Write your solution here..."
           disabled={isCurrentSubmitted}
-          style={{ minHeight: '400px' }}
         />
+        
+        {/* Output Section - Above controls, scrollable */}
+        {output && (
+          <div className="border-t border-gray-200 flex-shrink-0 max-h-48 overflow-y-auto">
+            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+              <h4 className="font-medium text-gray-900">Output & Test Results</h4>
+            </div>
+            <div className="p-4">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono bg-gray-100 p-3 rounded-lg">
+                {output}
+              </pre>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Controls */}
-      <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-4">
+      {/* Sticky Controls at Bottom */}
+      <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white space-y-4">
         <div>
           <Label htmlFor="custom-input" className="text-sm font-medium mb-2 block">
             Custom Input (Optional)
@@ -132,20 +145,6 @@ const MockCodeEditorPanel = ({
           </Button>
         </div>
       </div>
-
-      {/* Output Section */}
-      {output && (
-        <div className="border-t border-gray-200 flex-shrink-0">
-          <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-            <h4 className="font-medium text-gray-900">Output</h4>
-          </div>
-          <div className="p-4 max-h-48 overflow-y-auto">
-            <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
-              {output}
-            </pre>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

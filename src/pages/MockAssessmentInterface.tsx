@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
@@ -179,7 +178,7 @@ const MockAssessmentInterface = () => {
           <ResizablePanelGroup direction="horizontal" className="h-full">
             {/* Left Panel - Problem Description */}
             <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
-              <div className="h-full overflow-y-auto p-6 bg-white">
+              <div className="h-full p-6 bg-white">
                 <MockProblemDisplay 
                   problem={currentProblem}
                   currentQuestionIndex={currentQuestionIndex}
