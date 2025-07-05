@@ -1,243 +1,211 @@
 
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Code, Building, Users, Award, CheckCircle, ArrowRight, Timer } from "lucide-react";
-
-const mockAssessmentData = {
-  1: {
-    id: 1,
-    title: "Full Stack Developer Assessment",
-    description: "Complete assessment covering frontend, backend, and database concepts with coding problems.",
-    duration: "60 mins",
-    problems: 2,
-    difficulty: "Medium",
-    category: "General Assessment",
-    about: "This comprehensive coding assessment evaluates your full-stack development skills through practical programming challenges. You'll solve real-world problems that test your ability to implement algorithms, work with data structures, and write clean, efficient code.",
-    benefits: [
-      "Test your problem-solving abilities",
-      "Practice coding under time pressure",
-      "Evaluate algorithmic thinking skills",
-      "Prepare for technical interviews"
-    ],
-    topics: [
-      "Data Structures and Algorithms",
-      "Problem Solving Techniques",
-      "Code Optimization",
-      "Time and Space Complexity",
-      "Implementation Skills",
-      "Debugging and Testing"
-    ],
-    icon: <Code className="h-8 w-8 text-blue-500" />
-  },
-  2: {
-    id: 2,
-    title: "Data Structures Assessment",
-    description: "Advanced coding problems focusing on complex data structures and algorithms.",
-    duration: "60 mins",
-    problems: 2,
-    difficulty: "Hard",
-    category: "Technical Assessment",
-    about: "Challenge yourself with advanced data structure and algorithm problems. This assessment focuses on complex problem-solving scenarios that require deep understanding of efficient data organization and manipulation techniques.",
-    benefits: [
-      "Master advanced data structures",
-      "Improve algorithmic complexity analysis",
-      "Enhance coding interview preparation",
-      "Build confidence in problem solving"
-    ],
-    topics: [
-      "Advanced Trees and Graphs",
-      "Dynamic Programming",
-      "Complex Algorithm Design",
-      "Optimization Techniques",
-      "Advanced Data Manipulation",
-      "System Design Concepts"
-    ],
-    icon: <Code className="h-8 w-8 text-green-500" />
-  },
-  4: {
-    id: 4,
-    title: "TCS CodeVita Assessment",
-    company: "TCS",
-    description: "Practice TCS-style coding problems and algorithmic challenges.",
-    duration: "60 mins",
-    problems: 2,
-    difficulty: "Medium",
-    category: "Company Assessment",
-    about: "Simulate the TCS CodeVita coding competition experience with carefully crafted problems that mirror the actual assessment format. Perfect preparation for TCS technical interviews and coding competitions.",
-    benefits: [
-      "Experience TCS-style problems",
-      "Understand TCS assessment format",
-      "Practice competitive programming",
-      "Improve coding speed and accuracy"
-    ],
-    topics: [
-      "Mathematical Problem Solving",
-      "String Manipulation",
-      "Array and Matrix Operations",
-      "Graph Theory Applications",
-      "Greedy Algorithms",
-      "Implementation Challenges"
-    ],
-    icon: <Building className="h-8 w-8 text-blue-600" />
-  }
-};
-
-const relatedAssessments = [
-  { id: 5, title: "Wipro NLTH Assessment", difficulty: "Medium", company: "Wipro" },
-  { id: 6, title: "Google SDE Assessment", difficulty: "Hard", company: "Google" },
-  { id: 7, title: "Accenture Coding Test", difficulty: "Easy", company: "Accenture" },
-  { id: 3, title: "System Design Assessment", difficulty: "Hard", category: "Technical" }
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Users, FileText, Monitor, Play } from "lucide-react";
 
 const MockAssessmentDetail = () => {
-  const { assessmentId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  
-  const assessmentIdNumber = parseInt(assessmentId || '0', 10);
-  const assessment = mockAssessmentData[assessmentIdNumber as keyof typeof mockAssessmentData];
-  
-  if (!assessment) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Assessment Not Found</h1>
-          <Button onClick={() => navigate('/mock-assessment')}>Back to Mock Assessments</Button>
-        </div>
-      </Layout>
-    );
-  }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Easy": return "text-green-600 bg-green-100";
-      case "Medium": return "text-yellow-600 bg-yellow-100";
-      case "Hard": return "text-red-600 bg-red-100";
-      default: return "text-gray-600 bg-gray-100";
-    }
+  // Mock data - in real app this would come from API
+  const assessment = {
+    id: parseInt(id || "1"),
+    title: "Company-wise Assessment: TCS",
+    description: "Test your skills with TCS-specific interview questions focusing on data structures, algorithms, and problem-solving techniques used in technical interviews.",
+    duration: "60 mins",
+    problems: 2,
+    difficulty: "Medium",
+    company: "TCS",
+    type: "Company-wise",
+    topic: "Arrays & Algorithms",
+    participants: 850,
+    passingScore: 70,
+    topics: ["Arrays", "Two Pointers", "Hash Tables", "String Manipulation"],
+    problemTitles: ["Two Sum", "Valid Parentheses"],
+    instructions: [
+      "This is a timed assessment with 2 coding problems",
+      "You have 60 minutes to complete both problems",
+      "You can switch between problems at any time",
+      "Code will be automatically saved as you type",
+      "Submit each problem when you're confident in your solution",
+      "Full screen mode is required during the assessment"
+    ]
   };
 
   const handleStartAssessment = () => {
-    navigate(`/mock-assessment/${assessmentId}/interface`);
+    navigate(`/mock-assessment/${id}/fullscreen`);
+  };
+
+  const handleStartRegularInterface = () => {
+    navigate(`/mock-assessment/${id}/interface`);
   };
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Related Assessments Sidebar */}
-          <div className="lg:col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Related Assessments</h3>
-            <div className="space-y-3">
-              {relatedAssessments.map((relatedAssessment) => (
-                <Card key={relatedAssessment.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <h4 className="font-medium text-sm text-gray-900 mb-2">{relatedAssessment.title}</h4>
-                    {'company' in relatedAssessment && (
-                      <div className="text-xs text-brand-red font-medium mb-1">{relatedAssessment.company}</div>
-                    )}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(relatedAssessment.difficulty)}`}>
-                      {relatedAssessment.difficulty}
-                    </span>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">{assessment.title}</h1>
+            <Badge variant="secondary" className="text-lg px-3 py-1">
+              {assessment.difficulty}
+            </Badge>
           </div>
+          <p className="text-gray-600 text-lg leading-relaxed">
+            {assessment.description}
+          </p>
+        </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            {/* Header */}
-            <div className="mb-8">
-              <div className="flex items-center gap-4 mb-4">
-                {assessment.icon}
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{assessment.title}</h1>
-                  <p className="text-gray-600">{assessment.category}</p>
-                  {'company' in assessment && (
-                    <p className="text-brand-red font-medium">{assessment.company}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 mb-6">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(assessment.difficulty)}`}>
-                  {assessment.difficulty}
-                </span>
-                <div className="flex items-center gap-1 text-gray-600">
-                  <Timer className="h-4 w-4" />
-                  <span>{assessment.duration}</span>
-                </div>
-                <div className="flex items-center gap-1 text-gray-600">
-                  <Code className="h-4 w-4" />
-                  <span>{assessment.problems} Coding Problems</span>
-                </div>
-              </div>
-            </div>
-
-            {/* About Section */}
-            <Card className="mb-6">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Assessment Overview */}
+            <Card>
               <CardHeader>
-                <CardTitle>About This Assessment</CardTitle>
+                <CardTitle>Assessment Overview</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{assessment.about}</p>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <div className="font-medium">Duration</div>
+                      <div className="text-gray-600">{assessment.duration}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-green-600" />
+                    <div>
+                      <div className="font-medium">Problems</div>
+                      <div className="text-gray-600">{assessment.problems} coding questions</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-purple-600" />
+                    <div>
+                      <div className="font-medium">Participants</div>
+                      <div className="text-gray-600">{assessment.participants.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Monitor className="h-5 w-5 text-orange-600" />
+                    <div>
+                      <div className="font-medium">Company</div>
+                      <div className="text-gray-600">{assessment.company}</div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Benefits Section */}
-            <Card className="mb-6">
+            {/* Problems */}
+            <Card>
               <CardHeader>
-                <CardTitle>Benefits</CardTitle>
+                <CardTitle>Problems Included</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {assessment.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{benefit}</span>
+                <div className="space-y-3">
+                  {assessment.problemTitles.map((title, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-medium">
+                          {index + 1}
+                        </div>
+                        <span className="font-medium">{title}</span>
+                      </div>
+                      <Badge variant="outline">{assessment.difficulty}</Badge>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Topics Covered */}
-            <Card className="mb-8">
+            {/* Topics */}
+            <Card>
               <CardHeader>
                 <CardTitle>Topics Covered</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="flex flex-wrap gap-2">
                   {assessment.topics.map((topic, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <ArrowRight className="h-4 w-4 text-brand-red" />
-                      <span className="text-gray-700">{topic}</span>
-                    </div>
+                    <Badge key={index} variant="secondary" className="px-3 py-1">
+                      {topic}
+                    </Badge>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Action Buttons */}
-            <div className="flex gap-4">
-              <Button 
-                onClick={handleStartAssessment}
-                size="lg"
-                className="bg-brand-red hover:bg-red-500 text-white px-8"
-              >
-                Start Assessment
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                onClick={() => navigate('/mock-assessment')}
-              >
-                Back to Assessments
-              </Button>
-            </div>
+            {/* Instructions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Instructions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {assessment.instructions.map((instruction, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-blue-600 mt-1">•</span>
+                      <span className="text-gray-700">{instruction}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Start Assessment */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-center">Ready to Start?</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button 
+                  onClick={handleStartAssessment} 
+                  className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700"
+                >
+                  <Play className="h-5 w-5 mr-2" />
+                  Start Full-Screen Assessment
+                </Button>
+                <Button 
+                  onClick={handleStartRegularInterface} 
+                  variant="outline"
+                  className="w-full h-12 text-lg"
+                >
+                  <Monitor className="h-5 w-5 mr-2" />
+                  Regular Interface
+                </Button>
+                <p className="text-sm text-gray-600 text-center">
+                  Full-screen mode provides the best coding experience similar to real technical interviews.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Assessment Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Assessment Stats</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Type:</span>
+                  <span className="font-medium">{assessment.type}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Passing Score:</span>
+                  <span className="font-medium">{assessment.passingScore}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Focus Area:</span>
+                  <span className="font-medium">{assessment.topic}</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
