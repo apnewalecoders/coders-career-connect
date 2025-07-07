@@ -48,9 +48,10 @@ interface MockCodeEditorProps {
   problem: Problem;
   isSolved: boolean;
   onSubmissionSuccess: () => void;
+  onFullScreenExit?: () => void;
 }
 
-const MockCodeEditor = ({ problem, isSolved, onSubmissionSuccess }: MockCodeEditorProps) => {
+const MockCodeEditor = ({ problem, isSolved, onSubmissionSuccess, onFullScreenExit }: MockCodeEditorProps) => {
   const [selectedLanguage, setSelectedLanguage] = useState("python");
   const [code, setCode] = useState(defaultCode.python);
   const [customInput, setCustomInput] = useState("");
@@ -65,6 +66,28 @@ const MockCodeEditor = ({ problem, isSolved, onSubmissionSuccess }: MockCodeEdit
     handleRun,
     handleSubmit
   } = useCodeExecution();
+
+  // Full screen monitoring
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      if (!document.fullscreenElement && onFullScreenExit) {
+        // User exited full screen - auto submit
+        onFullScreenExit();
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullScreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
+    };
+  }, [onFullScreenExit]);
 
   // Load saved code from localStorage
   useEffect(() => {

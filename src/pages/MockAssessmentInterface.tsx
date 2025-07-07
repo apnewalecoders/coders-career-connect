@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Clock, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -90,6 +89,7 @@ const MockAssessmentInterface = () => {
   const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes in seconds
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [submissions, setSubmissions] = useState<{[key: number]: boolean}>({0: false, 1: false});
+  const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -137,6 +137,28 @@ const MockAssessmentInterface = () => {
     navigate(`/mock-assessment/${assessmentId}/results`, {
       state: { timeExpired: false, submissions }
     });
+  };
+
+  const handleFullScreenExit = () => {
+    if (!hasAutoSubmitted) {
+      setHasAutoSubmitted(true);
+      toast({
+        title: "Assessment Auto-Submitted",
+        description: "You exited full-screen mode. Your assessment has been automatically submitted.",
+        variant: "destructive"
+      });
+      
+      // Navigate to results after a short delay
+      setTimeout(() => {
+        navigate(`/mock-assessment/${assessmentId}/results`, {
+          state: { 
+            timeExpired: false, 
+            submissions,
+            autoSubmitted: true 
+          }
+        });
+      }, 2000);
+    }
   };
 
   const handleSubmissionSuccess = () => {
@@ -205,7 +227,7 @@ const MockAssessmentInterface = () => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Exit Assessment?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to exit? Your progress will be saved.
+                    Are you sure you want to exit? Your progress will be saved and the assessment will be automatically submitted.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -262,6 +284,7 @@ const MockAssessmentInterface = () => {
               }}
               isSolved={isCurrentSubmitted}
               onSubmissionSuccess={handleSubmissionSuccess}
+              onFullScreenExit={handleFullScreenExit}
             />
           </ResizablePanel>
         </ResizablePanelGroup>
