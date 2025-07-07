@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Clock, LogOut, Play, Send, RotateCcw, Settings, Sun, Moon, ChevronDown, ChevronUp } from "lucide-react";
+import { Clock, LogOut, Play, Send, RotateCcw, Settings, Sun, Moon, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -236,6 +235,18 @@ const FullScreenMockAssessment = () => {
     setIsOutputVisible(true);
   };
 
+  const handlePrevQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestion < mockProblems.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    }
+  };
+
   const currentProblem = mockProblems[currentQuestion];
   const hasOutput = output || testResults.length > 0;
 
@@ -385,6 +396,49 @@ const FullScreenMockAssessment = () => {
           {/* Right Panel - Code Editor */}
           <ResizablePanel defaultSize={55} minSize={40}>
             <div className="h-full bg-white flex flex-col">
+              {/* Navigation Bar */}
+              <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handlePrevQuestion}
+                      disabled={currentQuestion === 0}
+                      className="h-8 px-3 text-sm font-medium text-gray-600 hover:text-gray-900"
+                    >
+                      Prev
+                    </Button>
+                    
+                    <div className="flex items-center gap-1 px-3 py-1 bg-white border border-gray-200 rounded text-sm font-medium text-gray-700">
+                      {currentQuestion + 1} / {mockProblems.length}
+                    </div>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleNextQuestion}
+                      disabled={currentQuestion === mockProblems.length - 1}
+                      className="h-8 px-3 text-sm font-medium text-gray-600 hover:text-gray-900"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Select value={isOutputVisible ? "console" : "hidden"} onValueChange={(value) => setIsOutputVisible(value === "console")}>
+                      <SelectTrigger className="w-28 h-8 text-sm">
+                        <SelectValue placeholder="Console" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="console">Console</SelectItem>
+                        <SelectItem value="hidden">Hidden</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
               {/* Editor Header */}
               <div className="p-3 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
