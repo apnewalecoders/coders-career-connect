@@ -4,45 +4,54 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Clock, LogOut, Play, Send, RotateCcw } from "lucide-react";
+import { Clock, LogOut, Play, Send, RotateCcw, Settings, Sun, Moon, ChevronDown, ChevronUp } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import MonacoCodeEditor from "@/components/editor/MonacoCodeEditor";
+import Editor from "@monaco-editor/react";
+import { languages, defaultCode } from "@/components/editor/types";
+import { useCodeExecution } from "@/components/editor/hooks/useCodeExecution";
+import OutputSection from "@/components/editor/components/OutputSection";
 
 const mockProblems = [
   {
     id: 1,
-    title: "Two Sum",
-    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+    title: "Fibonacci Number",
+    description: `The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is,
 
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
+F(0) = 0, F(1) = 1
+F(n) = F(n - 1) + F(n - 2), for n > 1.
 
-You can return the answer in any order.`,
+Given n, calculate F(n).`,
     examples: [
       {
-        input: "nums = [2,7,11,15], target = 9",
-        output: "[0,1]",
-        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]."
+        input: "n = 2",
+        output: "1",
+        explanation: "F(2) = F(1) + F(0) = 1 + 0 = 1."
       },
       {
-        input: "nums = [3,2,4], target = 6",
-        output: "[1,2]"
+        input: "n = 3",
+        output: "2",
+        explanation: "F(3) = F(2) + F(1) = 1 + 1 = 2."
+      },
+      {
+        input: "n = 4",
+        output: "3"
       }
     ],
     constraints: [
-      "2 ≤ nums.length ≤ 10⁴",
-      "-10⁹ ≤ nums[i] ≤ 10⁹", 
-      "-10⁹ ≤ target ≤ 10⁹",
-      "Only one valid answer exists."
+      "0 ≤ n ≤ 30"
     ],
     difficulty: "Easy",
     testCases: [
-      { input: "4\n2 7 11 15\n9", expectedOutput: "[0, 1]" },
-      { input: "3\n3 2 4\n6", expectedOutput: "[1, 2]" }
+      { input: "2", expectedOutput: "1" },
+      { input: "3", expectedOutput: "2" },
+      { input: "4", expectedOutput: "3" }
     ]
   },
   {
@@ -88,20 +97,25 @@ const FullScreenMockAssessment = () => {
   
   const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [codes, setCodes] = useState<{[key: number]: string}>({
-    0: "def twoSum(nums, target):\n    # Write your solution here\n    pass",
-    1: "def isValid(s):\n    # Write your solution here\n    pass"
-  });
-  const [language, setLanguage] = useState("python");
+  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [code, setCode] = useState(defaultCode.python);
   const [customInput, setCustomInput] = useState("");
-  const [output, setOutput] = useState("");
-  const [isRunning, setIsRunning] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [outputExpanded, setOutputExpanded] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isOutputVisible, setIsOutputVisible] = useState(false);
+  const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
   const [questionStatus, setQuestionStatus] = useState<{[key: number]: 'unsolved' | 'attempted' | 'solved'}>({
     0: 'unsolved',
     1: 'unsolved'
   });
+
+  const {
+    isRunning,
+    isSubmitting,
+    output,
+    testResults,
+    handleRun,
+    handleSubmit
+  } = useCodeExecution();
 
   // Timer effect
   useEffect(() => {
@@ -124,25 +138,51 @@ const FullScreenMockAssessment = () => {
     enterFullScreen();
 
     const handleFullScreenChange = () => {
-      if (!document.fullscreenElement) {
-        // User exited full screen - show warning
+      if (!document.fullscreenElement && !hasAutoSubmitted) {
+        setHasAutoSubmitted(true);
         toast({
-          title: "Full Screen Mode Required",
-          description: "Please stay in full screen mode during the assessment",
+          title: "Assessment Auto-Submitted",
+          description: "You exited full-screen mode. Your assessment has been automatically submitted.",
           variant: "destructive"
         });
+        
+        setTimeout(() => {
+          navigate(`/mock-assessment/${assessmentId}/results`, {
+            state: { 
+              timeExpired: false, 
+              questionStatus,
+              autoSubmitted: true 
+            }
+          });
+        }, 2000);
       }
     };
 
     document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullScreenChange);
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
       if (document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
       }
     };
-  }, [toast]);
+  }, [toast, navigate, assessmentId, questionStatus, hasAutoSubmitted]);
+
+  // Load saved code
+  useEffect(() => {
+    const savedCode = localStorage.getItem(`mock_code_${currentQuestion}_${selectedLanguage}`);
+    if (savedCode) {
+      setCode(savedCode);
+    } else {
+      setCode(defaultCode[selectedLanguage as keyof typeof defaultCode]);
+    }
+  }, [selectedLanguage, currentQuestion]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -165,289 +205,341 @@ const FullScreenMockAssessment = () => {
     });
   };
 
-  const handleCodeChange = (value: string) => {
-    setCodes(prev => ({ ...prev, [currentQuestion]: value }));
+  const saveCode = (newCode: string) => {
+    setCode(newCode);
+    localStorage.setItem(`mock_code_${currentQuestion}_${selectedLanguage}`, newCode);
     if (questionStatus[currentQuestion] === 'unsolved') {
       setQuestionStatus(prev => ({ ...prev, [currentQuestion]: 'attempted' }));
     }
   };
 
-  const handleRun = async () => {
-    setIsRunning(true);
-    setOutputExpanded(true);
-    
-    // Simulate code execution
-    setTimeout(() => {
-      let result = "";
-      if (customInput.trim()) {
-        result = `Input: ${customInput}\nOutput: [Sample output for custom input]`;
-      } else {
-        result = `Sample Test Case:\n${mockProblems[currentQuestion].examples[0].input}\nOutput: ${mockProblems[currentQuestion].examples[0].output}\n\n✅ Sample test passed`;
-      }
-      setOutput(result);
-      setIsRunning(false);
-    }, 2000);
+  const resetCode = () => {
+    const freshCode = defaultCode[selectedLanguage as keyof typeof defaultCode];
+    setCode(freshCode);
+    localStorage.removeItem(`mock_code_${currentQuestion}_${selectedLanguage}`);
   };
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    
-    // Simulate submission
-    setTimeout(() => {
-      const success = Math.random() > 0.3; // 70% success rate for demo
-      
-      if (success) {
-        setQuestionStatus(prev => ({ ...prev, [currentQuestion]: 'solved' }));
-        toast({
-          title: "Success!",
-          description: "All test cases passed!"
-        });
-        setOutput("✅ All test cases passed!\n\nTest Case 1: Passed\nTest Case 2: Passed\nTest Case 3: Passed");
-      } else {
-        toast({
-          title: "Some tests failed",
-          description: "Please review your solution",
-          variant: "destructive"
-        });
-        setOutput("❌ Some test cases failed\n\nTest Case 1: Passed\nTest Case 2: Failed\nTest Case 3: Passed");
-      }
-      
-      setOutputExpanded(true);
-      setIsSubmitting(false);
-    }, 3000);
+  const onRun = () => {
+    handleRun(code, selectedLanguage, customInput);
+    setIsOutputVisible(true);
   };
 
-  const handleReset = () => {
-    const defaultCode = currentQuestion === 0 
-      ? "def twoSum(nums, target):\n    # Write your solution here\n    pass"
-      : "def isValid(s):\n    # Write your solution here\n    pass";
-    setCodes(prev => ({ ...prev, [currentQuestion]: defaultCode }));
+  const onSubmit = () => {
+    const currentProblem = mockProblems[currentQuestion];
+    handleSubmit(code, selectedLanguage, currentProblem.testCases || [], currentProblem.title, () => {
+      setQuestionStatus(prev => ({ ...prev, [currentQuestion]: 'solved' }));
+      toast({
+        title: "Code Submitted!",
+        description: `Question ${currentQuestion + 1} has been submitted successfully.`
+      });
+    });
+    setIsOutputVisible(true);
   };
 
   const currentProblem = mockProblems[currentQuestion];
+  const hasOutput = output || testResults.length > 0;
 
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col">
-      {/* Fixed Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0 shadow-sm">
-        <div className="flex items-center justify-between max-w-full">
-          <h1 className="text-lg font-semibold text-gray-900">Mock Assessment #{assessmentId}</h1>
-          
-          <div className="flex items-center gap-2 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
-            <Clock className="h-5 w-5 text-red-600" />
-            <span className="font-mono text-xl font-bold text-red-600">
-              {formatTime(timeLeft)}
-            </span>
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-lg font-semibold text-gray-900">Mock Assessment #{assessmentId}</h1>
+            <div className="flex gap-2">
+              {mockProblems.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentQuestion(index)}
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                    index === currentQuestion
+                      ? 'bg-blue-600 text-white'
+                      : questionStatus[index] === 'solved'
+                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                      : questionStatus[index] === 'attempted'
+                      ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {index + 1}
+                  {questionStatus[index] === 'solved' && ' ✓'}
+                </button>
+              ))}
+            </div>
           </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+              <Clock className="h-5 w-5 text-red-600" />
+              <span className="font-mono text-xl font-bold text-red-600">
+                {formatTime(timeLeft)}
+              </span>
+            </div>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                <LogOut className="h-4 w-4 mr-2" />
-                Exit
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Exit Assessment?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to exit? Your progress will be saved.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
-                  Exit Assessment
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Exit
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Exit Assessment?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to exit? Your progress will be saved and the assessment will be automatically submitted.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleExit} className="bg-red-600 hover:bg-red-700">
+                    Exit Assessment
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </div>
 
-      {/* Question Navigation Tabs */}
-      <Tabs value={currentQuestion.toString()} onValueChange={(value) => setCurrentQuestion(parseInt(value))} className="flex-shrink-0">
-        <div className="bg-gray-50 border-b px-4 py-2">
-          <TabsList className="grid w-fit grid-cols-2">
-            {mockProblems.map((_, index) => (
-              <TabsTrigger 
-                key={index} 
-                value={index.toString()}
-                className="relative data-[state=active]:bg-white data-[state=active]:shadow-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    questionStatus[index] === 'solved' ? 'bg-green-500' :
-                    questionStatus[index] === 'attempted' ? 'bg-yellow-500' : 'bg-gray-300'
-                  }`} />
-                  Question {index + 1}
-                </div>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
-          <ResizablePanelGroup direction="horizontal" className="h-full">
-            {/* Left Panel - Problem Description */}
-            <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
-              <div className="h-full overflow-y-auto p-6 bg-white">
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <h2 className="text-2xl font-bold text-gray-900">{currentProblem.title}</h2>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        currentProblem.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
-                        currentProblem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
-                        {currentProblem.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                      {currentProblem.description}
-                    </p>
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          {/* Left Panel - Problem Statement */}
+          <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
+            <div className="h-full bg-white overflow-y-auto">
+              <div className="p-6 space-y-6">
+                {/* Problem Header */}
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <h2 className="text-xl font-bold text-gray-900">{currentProblem.title}</h2>
+                    <Badge className={`${
+                      currentProblem.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                      currentProblem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {currentProblem.difficulty}
+                    </Badge>
                   </div>
+                </div>
 
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Examples</h3>
-                    <div className="space-y-4">
-                      {currentProblem.examples.map((example, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-4">
-                          <div className="space-y-2">
+                {/* Problem Description */}
+                <div>
+                  <div className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">
+                    {currentProblem.description}
+                  </div>
+                </div>
+
+                {/* Examples */}
+                {currentProblem.examples && currentProblem.examples.length > 0 && (
+                  <div className="space-y-4">
+                    {currentProblem.examples.map((example, index) => (
+                      <div key={index} className="space-y-2">
+                        <h3 className="font-semibold text-gray-900 text-sm">Example {index + 1}:</h3>
+                        <div className="bg-gray-50 p-4 rounded-lg border">
+                          <div className="space-y-3">
                             <div>
-                              <span className="font-medium text-gray-900">Input: </span>
-                              <code className="bg-gray-200 px-2 py-1 rounded text-sm">{example.input}</code>
+                              <span className="font-medium text-gray-700 text-sm">Input:</span>
+                              <pre className="mt-1 text-xs text-gray-800 font-mono bg-white p-2 rounded border">
+                                {example.input}
+                              </pre>
                             </div>
                             <div>
-                              <span className="font-medium text-gray-900">Output: </span>
-                              <code className="bg-gray-200 px-2 py-1 rounded text-sm">{example.output}</code>
+                              <span className="font-medium text-gray-700 text-sm">Output:</span>
+                              <pre className="mt-1 text-xs text-gray-800 font-mono bg-white p-2 rounded border">
+                                {example.output}
+                              </pre>
                             </div>
                             {example.explanation && (
                               <div>
-                                <span className="font-medium text-gray-900">Explanation: </span>
-                                <span className="text-gray-700">{example.explanation}</span>
+                                <span className="font-medium text-gray-700 text-sm">Explanation:</span>
+                                <p className="mt-1 text-xs text-gray-700">{example.explanation}</p>
                               </div>
                             )}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Constraints</h3>
-                    <ul className="space-y-1 text-gray-700">
-                      {currentProblem.constraints.map((constraint, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span>•</span>
-                          <code className="text-sm bg-gray-100 px-1 rounded">{constraint}</code>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </ResizablePanel>
-
-            <ResizableHandle withHandle className="w-1 bg-gray-200 hover:bg-gray-300" />
-
-            {/* Right Panel - Code Editor */}
-            <ResizablePanel defaultSize={55} minSize={40}>
-              <div className="h-full flex flex-col bg-white">
-                {/* Editor Header */}
-                <div className="border-b border-gray-200 p-4 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">Code Editor</h3>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <Label htmlFor="language">Language:</Label>
-                        <Select value={language} onValueChange={setLanguage}>
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="python">Python</SelectItem>
-                            <SelectItem value="java">Java</SelectItem>
-                            <SelectItem value="cpp">C++</SelectItem>
-                            <SelectItem value="javascript">JavaScript</SelectItem>
-                          </SelectContent>
-                        </Select>
                       </div>
-                      <Button variant="outline" size="sm" onClick={handleReset}>
-                        <RotateCcw className="h-4 w-4 mr-2" />
-                        Reset
-                      </Button>
-                    </div>
+                    ))}
                   </div>
-                </div>
+                )}
 
-                {/* Code Editor */}
-                <div className="flex-1 min-h-0">
-                  <textarea
-                    value={codes[currentQuestion]}
-                    onChange={(e) => handleCodeChange(e.target.value)}
-                    className="w-full h-full p-4 font-mono text-sm border-0 resize-none focus:outline-none bg-gray-900 text-gray-100"
-                    placeholder="Write your solution here..."
-                    style={{ minHeight: '400px' }}
-                  />
-                </div>
-
-                {/* Controls */}
-                <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-4">
+                {/* Constraints */}
+                {currentProblem.constraints && (
                   <div>
-                    <Label htmlFor="custom-input" className="text-sm font-medium mb-2 block">
-                      Custom Input (Optional)
-                    </Label>
-                    <Input
-                      id="custom-input"
-                      value={customInput}
-                      onChange={(e) => setCustomInput(e.target.value)}
-                      placeholder="Enter custom test input..."
-                      className="font-mono text-sm"
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleRun}
-                      disabled={isRunning}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      {isRunning ? "Running..." : "Run"}
-                    </Button>
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      {isSubmitting ? "Submitting..." : "Submit"}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Output Section */}
-                {output && (
-                  <div className="border-t border-gray-200 flex-shrink-0">
-                    <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                      <h4 className="font-medium text-gray-900">Output</h4>
-                    </div>
-                    <div className="p-4 max-h-48 overflow-y-auto">
-                      <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
-                        {output}
-                      </pre>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-sm">Constraints:</h3>
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <ul className="space-y-1 text-xs text-gray-700">
+                        {currentProblem.constraints.map((constraint, index) => (
+                          <li key={index} className="font-mono">{constraint}</li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 )}
               </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </div>
-      </Tabs>
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle className="w-1 bg-gray-200 hover:bg-gray-300" />
+
+          {/* Right Panel - Code Editor */}
+          <ResizablePanel defaultSize={55} minSize={40}>
+            <div className="h-full bg-white flex flex-col">
+              {/* Editor Header */}
+              <div className="p-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                      <SelectTrigger className="w-36 h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {languages.map((lang) => (
+                          <SelectItem key={lang.value} value={lang.value}>
+                            {lang.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    {questionStatus[currentQuestion] === 'solved' && (
+                      <Badge className="bg-green-100 text-green-800 text-xs">
+                        Solved ✓
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetCode}
+                      className="h-8 px-2 text-xs"
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Reset
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsDarkMode(!isDarkMode)}
+                      className="h-8 px-2"
+                    >
+                      {isDarkMode ? <Sun className="h-3 w-3" /> : <Moon className="h-3 w-3" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-2"
+                    >
+                      <Settings className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Code Editor */}
+              <div className={`flex-1 ${hasOutput && isOutputVisible ? 'min-h-0' : ''}`}>
+                <Editor
+                  height="100%"
+                  language={selectedLanguage === 'cpp' ? 'cpp' : selectedLanguage}
+                  theme={isDarkMode ? 'vs-dark' : 'light'}
+                  value={code}
+                  onChange={(value) => saveCode(value || "")}
+                  options={{
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'on',
+                    automaticLayout: true,
+                    tabSize: 2,
+                    insertSpaces: true,
+                    renderLineHighlight: 'line',
+                    lineNumbers: 'on',
+                    folding: true,
+                    bracketMatching: 'always',
+                    autoIndent: 'full',
+                    formatOnPaste: true,
+                    formatOnType: true,
+                    padding: { top: 16, bottom: 16 }
+                  }}
+                />
+              </div>
+
+              {/* Output Section */}
+              {hasOutput && (
+                <div className={`border-t border-gray-200 ${isOutputVisible ? 'block' : 'hidden'}`}>
+                  <div className="p-3 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-gray-900 text-sm">Console</h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsOutputVisible(!isOutputVisible)}
+                        className="h-6 px-2"
+                      >
+                        {isOutputVisible ? (
+                          <ChevronDown className="h-3 w-3" />
+                        ) : (
+                          <ChevronUp className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="max-h-64">
+                    <OutputSection
+                      output={output}
+                      testResults={testResults}
+                      isDarkMode={isDarkMode}
+                      layout="default"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Input Section */}
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Input
+                  </label>
+                  <Textarea
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    placeholder="Enter your test input here..."
+                    className="h-20 font-mono text-sm resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons - Sticky at bottom */}
+              <div className="p-4 border-t border-gray-200 bg-white">
+                <div className="flex gap-3 justify-end">
+                  <Button
+                    onClick={onRun}
+                    disabled={isRunning}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 sm:flex-none"
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    {isRunning ? "Running..." : "Run Code"}
+                  </Button>
+                  <Button
+                    onClick={onSubmit}
+                    disabled={isSubmitting}
+                    size="sm"
+                    className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
     </div>
   );
 };
